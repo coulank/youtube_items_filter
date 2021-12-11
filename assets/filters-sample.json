@@ -1,0 +1,14 @@
+[
+    {
+        "channel": ["all"],
+        "title": ["迷惑系"],
+        "url": ["/feed"],
+        "effect": ["hidden"]
+    },
+    {
+        "channel": ["all"],
+        "title": ["閲覧注意"],
+        "effect": ["0.7"]
+    },
+    { "channel": ["公式"], "title": ["all"], "effect": ["#ff4d0029"] }
+]

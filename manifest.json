@@ -1,0 +1,17 @@
+{
+    "name": "YouTube items filter",
+    "author": "綿風コウラン",
+    "version": "1.0",
+    "manifest_version": 2,
+    "description": "YouTubeの動画一覧をフィルタリングすることができます",
+    "content_scripts": [
+        {
+            "matches": [ "https://www.youtube.com/*" ],
+            "js": ["script.js"],
+            "run_at": "document_start"
+        }
+    ],
+    "web_accessible_resources": [
+        "assets/*"
+    ]
+}
