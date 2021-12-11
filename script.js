@@ -20,54 +20,66 @@ var hidden_continue = 0;
 function video_filter(video_renderer) {
     var channel_elm =
         video_renderer.querySelector("#channel-name a") ||
-        document.querySelector("#channel-name");
+        document.querySelector('[role="main"] #channel-name');
     var channel_name = channel_elm ? channel_elm.innerText : "";
     var title_elm = video_renderer.querySelector("#video-title");
     var title_name = title_elm ? title_elm.innerText : "";
     var effect_add = false;
     var hidden = false;
-    filters.some((filter) => {
+    (filters || []).some((filter) => {
         var channel_fromnot = null;
         var title_fromnot = null;
         var url_fromnot = null;
         if (
-            (filter.channel || []).some((a_channel) => {
+            (filter.channel || ["all"]).some((a_channel) => {
                 if (a_channel.match(/^all$/i)) {
                     return true;
                 } else {
-                    var not = false;
-                    a_channel = a_channel.replace(/^!/, () => {
-                        not = true;
-                        return "";
+                    return a_channel.split(/\s+/).every((a_channel) => {
+                        var not = false;
+                        a_channel = a_channel.replace(/^!/, () => {
+                            not = true;
+                            return "";
+                        });
+                        var match_key = a_channel.match(/^\/.+\/\w*$/i)
+                            ? eval(a_channel)
+                            : a_channel;
+                        var result = Boolean(channel_name.match(match_key));
+                        if (not) {
+                            if (channel_fromnot === null)
+                                channel_fromnot = true;
+                            channel_fromnot &= !result;
+                        } else {
+                            return result;
+                        }
                     });
-                    var result = Boolean(channel_name.match(a_channel));
-                    if (not) {
-                        if (channel_fromnot === null) channel_fromnot = true;
-                        channel_fromnot &= !result;
-                    } else {
-                        return result;
-                    }
                 }
             }) ||
             channel_fromnot
         ) {
             if (
-                (filter.title || []).some((a_title) => {
+                (filter.title || ["all"]).some((a_title) => {
                     if (a_title.match(/^all$/i)) {
                         return true;
                     } else {
-                        var not = false;
-                        a_title = a_title.replace(/^!/, () => {
-                            not = true;
-                            return "";
+                        return a_title.split(/\s+/).every((a_title) => {
+                            var not = false;
+                            a_title = a_title.replace(/^!/, () => {
+                                not = true;
+                                return "";
+                            });
+                            var match_key = a_title.match(/^\/.+\/\w*$/i)
+                                ? eval(a_title)
+                                : a_title;
+                            var result = Boolean(title_name.match(match_key));
+                            if (not) {
+                                if (title_fromnot === null)
+                                    title_fromnot = true;
+                                title_fromnot &= !result;
+                            } else {
+                                return result;
+                            }
                         });
-                        var result = Boolean(title_name.match(a_title));
-                        if (not) {
-                            if (title_fromnot === null) title_fromnot = true;
-                            title_fromnot &= !result;
-                        } else {
-                            return result;
-                        }
                     }
                 }) ||
                 title_fromnot
@@ -112,6 +124,7 @@ function video_filter(video_renderer) {
                             effect_add = true;
                             return true;
                         } else if (!hidden) {
+                            // 数字だけは透明度、英数字は背景色になる
                             if (a_effect.match(/^[.\d]+/i)) {
                                 video_renderer.style.opacity = a_effect;
                             } else if (a_effect.match(/^#?\w+/i)) {
@@ -385,7 +398,11 @@ function main() {
             filter_setup();
         })
         .catch((e) => {
-            console.log("Please create assets/filters.json");
+            if (e.message.match(/failed.*fetch/i)) {
+                console.log("Please create assets/filters.json");
+            } else {
+                console.error(e);
+            }
         });
 }
 document.addEventListener("DOMContentLoaded", main, false);
