@@ -151,9 +151,9 @@ const video_check = (video) => {
 };
 const add_contents_check = (ytb_contents, hidden_pass = true) => {
     if (hidden_pass && ytb_contents.hidden) return;
-    const items = ytb_contents.querySelector(
-        "#items, ytd-item-section-renderer > #contents"
-    );
+    const items =
+        ytb_contents.querySelector("#items") ||
+        ytb_contents.querySelector("ytd-item-section-renderer > #contents");
     if (items) {
         items.childNodes.forEach((video) => {
             video_check(video);
