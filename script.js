@@ -37,7 +37,7 @@ function video_filter(video_renderer) {
                 } else {
                     return a_channel.split(/\s+/).every((a_channel) => {
                         var not = false;
-                        a_channel = a_channel.replace(/^!/, () => {
+                        a_channel = a_channel.replace(/^[!\-]/, () => {
                             not = true;
                             return "";
                         });
@@ -64,7 +64,7 @@ function video_filter(video_renderer) {
                     } else {
                         return a_title.split(/\s+/).every((a_title) => {
                             var not = false;
-                            a_title = a_title.replace(/^!/, () => {
+                            a_title = a_title.replace(/^[!\-]/, () => {
                                 not = true;
                                 return "";
                             });
@@ -90,7 +90,7 @@ function video_filter(video_renderer) {
                             return true;
                         } else {
                             var not = false;
-                            a_url = a_url.replace(/^!/, () => {
+                            a_url = a_url.replace(/^[!\-]/, () => {
                                 not = true;
                                 return "";
                             });
