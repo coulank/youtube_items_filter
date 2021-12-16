@@ -19,7 +19,7 @@ var hidden_continue = 0;
 
 function video_filter(video_renderer) {
     var channel_elm =
-        video_renderer.querySelector("#channel-name a") ||
+        video_renderer.querySelector("#channel-name") ||
         document.querySelector('[role="main"] #channel-name');
     var channel_name = channel_elm ? channel_elm.innerText : "";
     var title_elm = video_renderer.querySelector("#video-title");
