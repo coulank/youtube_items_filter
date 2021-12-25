@@ -16,6 +16,10 @@ const observer_contents_child_list = [];
 const observer_contents_contents_list = [];
 var main_browse = null;
 var hidden_continue = 0;
+var live_regexp = {
+    live: /live|ライブ/i,
+    streamed: /streamed|配信済み/i,
+};
 
 function video_filter(video_renderer) {
     var channel_elm =
@@ -24,6 +28,7 @@ function video_filter(video_renderer) {
     var channel_name = channel_elm ? channel_elm.innerText : "";
     var title_elm = video_renderer.querySelector("#video-title");
     var title_name = title_elm ? title_elm.innerText : "";
+    var meta_elm = video_renderer.querySelector(`#metadata-line`);
     var effect_add = false;
     var hidden = false;
     (filters || []).some((filter) => {
@@ -68,10 +73,34 @@ function video_filter(video_renderer) {
                                 not = true;
                                 return "";
                             });
-                            var match_key = a_title.match(/^\/.+\/\w*$/i)
-                                ? eval(a_title)
-                                : a_title;
-                            var result = Boolean(title_name.match(match_key));
+                            if (a_title.match(/^live$/i)) {
+                                var result = meta_elm
+                                    ? Boolean(
+                                          meta_elm.innerText.match(
+                                              live_regexp.streamed
+                                          )
+                                      )
+                                    : false;
+                                if (!result) {
+                                    var live_elm = video_renderer.querySelector(
+                                        `.badge-style-type-live-now, #text.ytd-thumbnail-overlay-time-status-renderer`
+                                    );
+                                    if (live_elm) {
+                                        result = Boolean(
+                                            live_elm.innerText.match(
+                                                live_regexp.live
+                                            )
+                                        );
+                                    }
+                                }
+                            } else {
+                                var match_key = a_title.match(/^\/.+\/\w*$/i)
+                                    ? eval(a_title)
+                                    : a_title;
+                                var result = Boolean(
+                                    title_name.match(match_key)
+                                );
+                            }
                             if (not) {
                                 if (title_fromnot === null)
                                     title_fromnot = true;

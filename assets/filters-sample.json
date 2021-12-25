@@ -11,5 +11,6 @@
         "effect": ["0.7"]
     },
     { "channel": ["公式", "/official/i"], "effect": ["#edf10f26"] },
-    { "title": ["おすすめ レビュー"], "effect": ["#fd28322b"] }
+    { "title": ["おすすめ レビュー"], "effect": ["#fd28322b"] },
+    { "title": ["live"], "effect": ["#a92e2e26"] }
 ]
