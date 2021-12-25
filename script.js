@@ -36,175 +36,189 @@ function video_filter(video_renderer) {
     var effect_add = false;
     var hidden = false;
     (filters || []).some((filter) => {
-        var channel_fromnot = null;
-        var title_fromnot = null;
-        var url_fromnot = null;
-        if (
-            (filter.channel || ["all"]).some((a_channel) => {
-                if (a_channel.match(/^all$/i)) {
+        var fromnot = null;
+        var fromnot_and = false;
+        var filter_result = (filter.channel || ["all"]).some((a_channel) => {
+            if (a_channel.match(/^all$/i)) {
+                return true;
+            } else {
+                return a_channel.split(/\s+/).every((a_channel, i) => {
+                    var not = false;
+                    a_channel = a_channel.replace(/^[!\-]/, () => {
+                        not = true;
+                        return "";
+                    });
+                    var match_key = a_channel.match(/^\/.+\/\w*$/i)
+                        ? eval(a_channel)
+                        : a_channel;
+                    var result = Boolean(channel_name.match(match_key));
+                    if (not) {
+                        if (fromnot === null) fromnot = true;
+                        fromnot &= !result;
+                    } else {
+                        if (!fromnot_and) fromnot_and = true;
+                        return result;
+                    }
+                });
+            }
+        });
+        if (fromnot !== null) {
+            if (fromnot_and) {
+                filter_result = filter_result && Boolean(fromnot);
+            } else {
+                filter_result = Boolean(fromnot);
+            }
+        }
+        if (filter_result) {
+            fromnot = null;
+            fromnot_and = false;
+            filter_result = (filter.title || ["all"]).some((a_title) => {
+                if (a_title.match(/^all$/i)) {
                     return true;
                 } else {
-                    return a_channel.split(/\s+/).every((a_channel) => {
-                        var not = false;
-                        a_channel = a_channel.replace(/^[!\-]/, () => {
-                            not = true;
-                            return "";
-                        });
-                        var match_key = a_channel.match(/^\/.+\/\w*$/i)
-                            ? eval(a_channel)
-                            : a_channel;
-                        var result = Boolean(channel_name.match(match_key));
-                        if (not) {
-                            if (channel_fromnot === null)
-                                channel_fromnot = true;
-                            channel_fromnot &= !result;
+                    return a_title.split(/\s+/).every((a_title) => {
+                        var not = false,
+                            a_title = a_title.replace(/^[!\-]/, () => {
+                                not = true;
+                                return "";
+                            });
+                        if (
+                            a_title.match(
+                                /^(live[_now]*|premieres?|scheduled|streamed)$/i
+                            )
+                        ) {
+                            var value = a_title.toLowerCase();
+                            var live_f = value === "live";
+                            var result = false;
+                            if (meta_elm) {
+                                if (live_f || value === "scheduled") {
+                                    result = meta_elm.innerText.match(
+                                        live_regexp.scheduled
+                                    );
+                                }
+                                if (
+                                    !result &&
+                                    (live_f || value === "streamed")
+                                ) {
+                                    result = meta_elm.innerText.match(
+                                        live_regexp.streamed
+                                    );
+                                }
+                                if (!result && value === "premieres") {
+                                    result = meta_elm.innerText.match(
+                                        live_regexp.premieres
+                                    );
+                                }
+                            }
+                            if (!result) {
+                                var live_hf = Boolean(/^live/);
+                                if (live_hf || value.match(/^premiere/)) {
+                                    var live_now_re = live_hf
+                                        ? live_regexp.live
+                                        : live_regexp.premiere;
+                                    var live_elm = video_renderer.querySelector(
+                                        `.badge-style-type-live-now`
+                                    );
+                                    if (live_elm) {
+                                        result = Boolean(
+                                            live_elm.innerText.match(
+                                                live_now_re
+                                            )
+                                        );
+                                    }
+                                }
+                            }
                         } else {
+                            var match_key = a_title.match(/^\/.+\/\w*$/i)
+                                ? eval(a_title)
+                                : a_title;
+                            var result = Boolean(title_name.match(match_key));
+                        }
+                        if (not) {
+                            if (fromnot === null) fromnot = true;
+                            fromnot &= !result;
+                        } else {
+                            if (!fromnot_and) fromnot_and = true;
                             return result;
                         }
                     });
                 }
-            }) ||
-            channel_fromnot
-        ) {
-            if (
-                (filter.title || ["all"]).some((a_title) => {
-                    if (a_title.match(/^all$/i)) {
-                        return true;
-                    } else {
-                        return a_title.split(/\s+/).every((a_title) => {
-                            var not = false,
-                                a_title = a_title.replace(/^[!\-]/, () => {
-                                    not = true;
-                                    return "";
-                                });
-                            if (
-                                a_title.match(
-                                    /^(live[_now]*|premieres?|scheduled|streamed)$/i
-                                )
-                            ) {
-                                var value = a_title.toLowerCase();
-                                var live_f = value === "live";
-                                var result = false;
-                                if (meta_elm) {
-                                    if (live_f || value === "scheduled") {
-                                        result = meta_elm.innerText.match(
-                                            live_regexp.scheduled
-                                        );
-                                    }
-                                    if (
-                                        !result &&
-                                        (live_f || value === "streamed")
-                                    ) {
-                                        result = meta_elm.innerText.match(
-                                            live_regexp.streamed
-                                        );
-                                    }
-                                    if (!result && value === "premieres") {
-                                        result = meta_elm.innerText.match(
-                                            live_regexp.premieres
-                                        );
-                                    }
-                                }
-                                if (!result) {
-                                    var live_hf = Boolean(/^live/);
-                                    if (live_hf || value.match(/^premiere/)) {
-                                        var live_now_re = live_hf
-                                            ? live_regexp.live
-                                            : live_regexp.premiere;
-                                        var live_elm =
-                                            video_renderer.querySelector(
-                                                `.badge-style-type-live-now`
-                                            );
-                                        if (live_elm) {
-                                            result = Boolean(
-                                                live_elm.innerText.match(
-                                                    live_now_re
-                                                )
-                                            );
-                                        }
-                                    }
-                                }
-                            } else {
-                                var match_key = a_title.match(/^\/.+\/\w*$/i)
-                                    ? eval(a_title)
-                                    : a_title;
-                                var result = Boolean(
-                                    title_name.match(match_key)
-                                );
-                            }
-                            if (not) {
-                                if (title_fromnot === null)
-                                    title_fromnot = true;
-                                title_fromnot &= !result;
-                            } else {
-                                return result;
-                            }
-                        });
-                    }
-                }) ||
-                title_fromnot
-            ) {
-                if (
-                    (filter.url || ["all"]).some((a_url) => {
-                        if (a_url.match(/^all$/i)) {
-                            return true;
-                        } else {
-                            var not = false;
-                            a_url = a_url.replace(/^[!\-]/, () => {
-                                not = true;
-                                return "";
-                            });
-                            if (a_url.length === 1) {
-                                var result = location.pathname === a_url;
-                            } else {
-                                var result = Boolean(
-                                    location.pathname.match(a_url)
-                                );
-                            }
-                            if (not) {
-                                if (url_fromnot === null) url_fromnot = true;
-                                url_fromnot &= !result;
-                            } else {
-                                return result;
-                            }
-                        }
-                    }) ||
-                    url_fromnot
-                ) {
-                    (filter.effect || []).some((a_effect) => {
-                        var a_effect_add = true;
-                        if (a_effect.match(/^hidden$/i)) {
-                            if (hidden_continue++ < 14) {
-                                video_renderer.style.display = "none";
-                            } else {
-                                video_renderer.style.opacity = "0.01";
-                                video_renderer.style.pointerEvents = "none";
-                            }
-                            hidden = true;
-                            effect_add = true;
-                            return true;
-                        } else if (hidden && a_effect.match(/^show$/i)) {
-                            video_renderer.style.display = "";
-                        } else if (!hidden) {
-                            // 数字だけは透明度、英数字は背景色になる
-                            if (a_effect.match(/^[.\d]+/i)) {
-                                if (a_effect === ".") {
-                                    video_renderer.style.opacity = "";
-                                } else {
-                                    video_renderer.style.opacity = a_effect;
-                                }
-                            } else if (a_effect.match(/^#?\w+/i)) {
-                                video_renderer.style.backgroundColor = a_effect;
-                            } else if (a_effect === "#") {
-                                video_renderer.style.backgroundColor = "";
-                            } else {
-                                a_effect_add = false;
-                            }
-                            if (a_effect_add) effect_add = true;
-                        }
-                    });
+            });
+            if (fromnot !== null) {
+                if (fromnot_and) {
+                    filter_result = filter_result && Boolean(fromnot);
+                } else {
+                    filter_result = Boolean(fromnot);
                 }
             }
+        }
+        if (filter_result) {
+            fromnot = null;
+            fromnot_and = false;
+            filter_result = (filter.url || ["all"]).some((a_url) => {
+                if (a_url.match(/^all$/i)) {
+                    return true;
+                } else {
+                    var not = false;
+                    a_url = a_url.replace(/^[!\-]/, () => {
+                        not = true;
+                        return "";
+                    });
+                    if (a_url.length === 1) {
+                        var result = location.pathname === a_url;
+                    } else {
+                        var result = Boolean(location.pathname.match(a_url));
+                    }
+                    if (not) {
+                        if (fromnot === null) fromnot = true;
+                        fromnot &= !result;
+                    } else {
+                        if (!fromnot_and) fromnot_and = true;
+                        return result;
+                    }
+                }
+            });
+            if (fromnot !== null) {
+                if (fromnot_and) {
+                    filter_result = filter_result && Boolean(fromnot);
+                } else {
+                    filter_result = Boolean(fromnot);
+                }
+            }
+        }
+        if (filter_result) {
+            (filter.effect || []).some((a_effect) => {
+                var a_effect_add = true;
+                if (a_effect.match(/^hidden$/i)) {
+                    if (hidden_continue++ < 14) {
+                        video_renderer.style.display = "none";
+                    } else {
+                        video_renderer.style.opacity = "0.01";
+                        video_renderer.style.pointerEvents = "none";
+                    }
+                    hidden = true;
+                    effect_add = true;
+                    return true;
+                } else if (hidden && a_effect.match(/^show$/i)) {
+                    video_renderer.style.display = "";
+                } else if (!hidden) {
+                    // 数字だけは透明度、英数字は背景色になる
+                    if (a_effect.match(/^[.\d]+/i)) {
+                        if (a_effect === ".") {
+                            video_renderer.style.opacity = "";
+                        } else {
+                            video_renderer.style.opacity = a_effect;
+                        }
+                    } else if (a_effect.match(/^#?\w+/i)) {
+                        video_renderer.style.backgroundColor = a_effect;
+                    } else if (a_effect === "#") {
+                        video_renderer.style.backgroundColor = "";
+                    } else {
+                        a_effect_add = false;
+                    }
+                    if (a_effect_add) effect_add = true;
+                }
+            });
         }
         if (hidden) return true;
     });

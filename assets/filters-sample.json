@@ -12,5 +12,12 @@
     },
     { "channel": ["公式", "/official/i"], "effect": ["#edf10f26"] },
     { "title": ["おすすめ レビュー"], "effect": ["#fd28322b"] },
-    { "title": ["live"], "effect": ["#a92e2e26"] }
+    {
+        "title": ["live_now"],
+        "effect": ["#ff323233"]
+    },
+    {
+        "title": ["-live_now", "live"],
+        "effect": ["#ff32321a"]
+    }
 ]
