@@ -18,7 +18,11 @@ var main_browse = null;
 var hidden_continue = 0;
 var live_regexp = {
     live: /live|ライブ/i,
-    metaline: /scheduled|streamed|公開予定|配信済み/i,
+    live_now: /live[_\s]?now|ライブ中/i,
+    premiere: /premiere|プレミア/i,
+    scheduled: /scheduled|公開予定/i,
+    streamed: /streamed|配信済み/i,
+    premieres: /premieres|プレミア公開/i,
 };
 
 function video_filter(video_renderer) {
@@ -68,29 +72,56 @@ function video_filter(video_renderer) {
                         return true;
                     } else {
                         return a_title.split(/\s+/).every((a_title) => {
-                            var not = false;
-                            a_title = a_title.replace(/^[!\-]/, () => {
-                                not = true;
-                                return "";
-                            });
-                            if (a_title.match(/^live$/i)) {
-                                var result = meta_elm
-                                    ? Boolean(
-                                          meta_elm.innerText.match(
-                                              live_regexp.metaline
-                                          )
-                                      )
-                                    : false;
-                                if (!result) {
-                                    var live_elm = video_renderer.querySelector(
-                                        `.badge-style-type-live-now`
-                                    );
-                                    if (live_elm) {
-                                        result = Boolean(
-                                            live_elm.innerText.match(
-                                                live_regexp.live
-                                            )
+                            var not = false,
+                                a_title = a_title.replace(/^[!\-]/, () => {
+                                    not = true;
+                                    return "";
+                                });
+                            if (
+                                a_title.match(
+                                    /^(live[_now]*|premieres?|scheduled|streamed)$/i
+                                )
+                            ) {
+                                var value = a_title.toLowerCase();
+                                var live_f = value === "live";
+                                var result = false;
+                                if (meta_elm) {
+                                    if (live_f || value === "scheduled") {
+                                        result = meta_elm.innerText.match(
+                                            live_regexp.scheduled
                                         );
+                                    }
+                                    if (
+                                        !result &&
+                                        (live_f || value === "streamed")
+                                    ) {
+                                        result = meta_elm.innerText.match(
+                                            live_regexp.streamed
+                                        );
+                                    }
+                                    if (!result && value === "premieres") {
+                                        result = meta_elm.innerText.match(
+                                            live_regexp.premieres
+                                        );
+                                    }
+                                }
+                                if (!result) {
+                                    var live_hf = Boolean(/^live/);
+                                    if (live_hf || value.match(/^premiere/)) {
+                                        var live_now_re = live_hf
+                                            ? live_regexp.live
+                                            : live_regexp.premiere;
+                                        var live_elm =
+                                            video_renderer.querySelector(
+                                                `.badge-style-type-live-now`
+                                            );
+                                        if (live_elm) {
+                                            result = Boolean(
+                                                live_elm.innerText.match(
+                                                    live_now_re
+                                                )
+                                            );
+                                        }
                                     }
                                 }
                             } else {
@@ -152,6 +183,8 @@ function video_filter(video_renderer) {
                             hidden = true;
                             effect_add = true;
                             return true;
+                        } else if (hidden && a_effect.match(/^show$/i)) {
+                            video_renderer.style.display = "";
                         } else if (!hidden) {
                             // 数字だけは透明度、英数字は背景色になる
                             if (a_effect.match(/^[.\d]+/i)) {
