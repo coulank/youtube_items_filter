@@ -155,11 +155,13 @@ function video_filter(video_renderer) {
                         } else if (!hidden) {
                             // 数字だけは透明度、英数字は背景色になる
                             if (a_effect.match(/^[.\d]+/i)) {
-                                video_renderer.style.opacity = a_effect;
+                                if (a_effect === ".") {
+                                    video_renderer.style.opacity = "";
+                                } else {
+                                    video_renderer.style.opacity = a_effect;
+                                }
                             } else if (a_effect.match(/^#?\w+/i)) {
                                 video_renderer.style.backgroundColor = a_effect;
-                            } else if (a_effect === ".") {
-                                video_renderer.style.opacity = "";
                             } else if (a_effect === "#") {
                                 video_renderer.style.backgroundColor = "";
                             } else {
