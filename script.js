@@ -158,6 +158,8 @@ function video_filter(video_renderer) {
                                 video_renderer.style.opacity = a_effect;
                             } else if (a_effect.match(/^#?\w+/i)) {
                                 video_renderer.style.backgroundColor = a_effect;
+                            } else if (a_effect === ".") {
+                                video_renderer.style.opacity = "";
                             } else if (a_effect === "#") {
                                 video_renderer.style.backgroundColor = "";
                             } else {
