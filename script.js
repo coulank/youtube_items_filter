@@ -18,7 +18,7 @@ var main_browse = null;
 var hidden_continue = 0;
 var live_regexp = {
     live: /live|ライブ/i,
-    streamed: /streamed|配信済み/i,
+    metaline: /scheduled|streamed|公開予定|配信済み/i,
 };
 
 function video_filter(video_renderer) {
@@ -77,13 +77,13 @@ function video_filter(video_renderer) {
                                 var result = meta_elm
                                     ? Boolean(
                                           meta_elm.innerText.match(
-                                              live_regexp.streamed
+                                              live_regexp.metaline
                                           )
                                       )
                                     : false;
                                 if (!result) {
                                     var live_elm = video_renderer.querySelector(
-                                        `.badge-style-type-live-now, #text.ytd-thumbnail-overlay-time-status-renderer`
+                                        `.badge-style-type-live-now`
                                     );
                                     if (live_elm) {
                                         result = Boolean(
