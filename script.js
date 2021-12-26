@@ -111,7 +111,7 @@ function video_filter(video_renderer) {
                                 }
                             }
                             if (!result) {
-                                var live_hf = Boolean(/^live/);
+                                var live_hf = Boolean(value.match(/^live/));
                                 if (live_hf || value.match(/^premiere/)) {
                                     var live_now_re = live_hf
                                         ? live_regexp.live
