@@ -233,8 +233,18 @@ function video_filter(video_renderer) {
     }
 }
 const video_check = (video) => {
-    if (video.hidden) return;
-    video_filter(video);
+    if (video.hidden || video.tagName.match(/continuation/i)) return;
+    var overlays = video.querySelector(`#overlays`);
+    if (overlays && overlays.childElementCount === 0) {
+        const observer_items = new MutationObserver((records) => {
+            video_filter(video);
+            observer_items.disconnect();
+            observer_items = null;
+        });
+        observer_items.observe(overlays, observe_option_childList);
+    } else {
+        video_filter(video);
+    }
 };
 const add_contents_check = (ytb_contents, hidden_pass = true) => {
     if (hidden_pass && ytb_contents.hidden) return;

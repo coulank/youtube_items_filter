@@ -17,7 +17,11 @@
         "effect": ["#ff323233"]
     },
     {
-        "title": ["-live_now", "live"],
+        "title": ["scheduled", "premieres"],
         "effect": ["#ff32321a"]
+    },
+    {
+        "title": ["streamed", "viewed"],
+        "effect": ["0.6"]
     }
 ]
