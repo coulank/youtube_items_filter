@@ -16,6 +16,7 @@ const observer_contents_child_list = [];
 const observer_contents_contents_list = [];
 var main_browse = null;
 var hidden_continue = 0;
+var viewed_regexp = /^(viewed)$/i;
 var live_regexp = {
     live: /live|ライブ/i,
     live_now: /live[_\s]?now|ライブ中/i,
@@ -82,6 +83,7 @@ function video_filter(video_renderer) {
                                 not = true;
                                 return "";
                             });
+                        var result = false;
                         if (
                             a_title.match(
                                 /^(live[_now]*|premieres?|scheduled|streamed)$/i
@@ -89,7 +91,6 @@ function video_filter(video_renderer) {
                         ) {
                             var value = a_title.toLowerCase();
                             var live_f = value === "live";
-                            var result = false;
                             if (meta_elm) {
                                 if (live_f || value === "scheduled") {
                                     result = meta_elm.innerText.match(
@@ -128,11 +129,15 @@ function video_filter(video_renderer) {
                                     }
                                 }
                             }
+                        } else if (a_title.match(viewed_regexp)) {
+                            result = Boolean(
+                                video_renderer.querySelector(`#progress`)
+                            );
                         } else {
                             var match_key = a_title.match(/^\/.+\/\w*$/i)
                                 ? eval(a_title)
                                 : a_title;
-                            var result = Boolean(title_name.match(match_key));
+                            result = Boolean(title_name.match(match_key));
                         }
                         if (not) {
                             if (fromnot === null) fromnot = true;
