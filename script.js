@@ -14,9 +14,11 @@ const observer_items_list = [];
 const observer_contents_list = [];
 const observer_contents_child_list = [];
 const observer_contents_contents_list = [];
+const innerTextBlank = { innerText: "" };
+const viewed_regexp = /^(viewed)$/i;
+const verified_regexp = /^(verified)$/i;
 var main_browse = null;
 var hidden_continue = 0;
-var viewed_regexp = /^(viewed)$/i;
 var live_regexp = {
     live: /live|ライブ/i,
     live_now: /live[_\s]?now|ライブ中/i,
@@ -27,15 +29,25 @@ var live_regexp = {
 };
 
 function video_filter(video_renderer) {
-    var channel_elm =
-        video_renderer.querySelector("#channel-name") ||
-        document.querySelector('[role="main"] #channel-name');
-    var channel_name = channel_elm ? channel_elm.innerText : "";
+    var channel_header = document.querySelector(
+        `[role="main"] #channel-header-container`
+    );
+    var channel_name = (
+        (channel_header || video_renderer).querySelector("#channel-name") ||
+        innerTextBlank
+    ).innerText;
+    var verified = Boolean(
+        (channel_header || video_renderer).querySelector(
+            ".badge-style-type-verified"
+        )
+    );
+    var viewed = Boolean(video_renderer.querySelector(`#progress`));
     var title_elm = video_renderer.querySelector("#video-title");
     var title_name = title_elm ? title_elm.innerText : "";
     var meta_elm = video_renderer.querySelector(`#metadata-line`);
     var effect_add = false;
     var hidden = false;
+
     (filters || []).some((filter) => {
         var fromnot = null;
         var fromnot_and = false;
@@ -49,10 +61,15 @@ function video_filter(video_renderer) {
                         not = true;
                         return "";
                     });
-                    var match_key = a_channel.match(/^\/.+\/\w*$/i)
-                        ? eval(a_channel)
-                        : a_channel;
-                    var result = Boolean(channel_name.match(match_key));
+                    var result = false;
+                    if (a_channel.match(verified_regexp)) {
+                        result = verified;
+                    } else {
+                        var match_key = a_channel.match(/^\/.+\/\w*$/i)
+                            ? eval(a_channel)
+                            : a_channel;
+                        result = Boolean(channel_name.match(match_key));
+                    }
                     if (not) {
                         if (fromnot === null) fromnot = true;
                         fromnot &= !result;
@@ -69,6 +86,9 @@ function video_filter(video_renderer) {
             } else {
                 filter_result = Boolean(fromnot);
             }
+        }
+        if (filter_result && filter.verified !== undefined) {
+            filter_result = verified;
         }
         if (filter_result) {
             fromnot = null;
@@ -130,9 +150,7 @@ function video_filter(video_renderer) {
                                 }
                             }
                         } else if (a_title.match(viewed_regexp)) {
-                            result = Boolean(
-                                video_renderer.querySelector(`#progress`)
-                            );
+                            result = viewed;
                         } else {
                             var match_key = a_title.match(/^\/.+\/\w*$/i)
                                 ? eval(a_title)
@@ -156,6 +174,9 @@ function video_filter(video_renderer) {
                     filter_result = Boolean(fromnot);
                 }
             }
+        }
+        if (filter_result && filter.viewed !== undefined) {
+            filter_result = viewed;
         }
         if (filter_result) {
             fromnot = null;
@@ -483,14 +504,30 @@ const filter_setup = () => {
     });
     observer.observe(page_manager, observe_option_childList);
 };
-
+function set_filters(v) {
+    filters = v;
+    filters.forEach((filter, key) => {
+        Object.keys(filter).forEach((k) => {
+            switch (k) {
+                case "viewed":
+                case "verified":
+                    break;
+                default:
+                    if (!Array.isArray(filter[k])) {
+                        filters[key][k] = [filter[k]];
+                    }
+                    break;
+            }
+        });
+    });
+}
 function main() {
     fetch(chrome.extension.getURL("assets/filters.json"))
         .then((r) => {
             return r.json();
         })
         .then((v) => {
-            filters = v;
+            set_filters(v);
             filter_setup();
         })
         .catch((e) => {

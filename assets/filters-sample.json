@@ -10,7 +10,7 @@
         "title": ["閲覧注意"],
         "effect": ["0.7"]
     },
-    { "channel": ["公式", "/official/i"], "effect": ["#edf10f26"] },
+    { "channel": ["公式", "/official/i", "verified"], "effect": ["#edf10f26"] },
     { "title": ["おすすめ レビュー"], "effect": ["#fd28322b"] },
     {
         "title": ["live_now"],
