@@ -239,7 +239,6 @@ const video_check = (video) => {
         const observer_items = new MutationObserver((records) => {
             video_filter(video);
             observer_items.disconnect();
-            observer_items = null;
         });
         observer_items.observe(overlays, observe_option_childList);
     } else {
