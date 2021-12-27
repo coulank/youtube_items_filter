@@ -254,7 +254,8 @@ function video_filter(video_renderer) {
     }
 }
 const video_check = (video) => {
-    if (video.hidden || video.tagName.match(/continuation/i)) return;
+    if (video.hidden || video.tagName.match(/continuation|shelf-renderer/i))
+        return;
     var overlays = video.querySelector(`#overlays`);
     if (overlays && overlays.childElementCount === 0) {
         const observer_items = new MutationObserver((records) => {
@@ -473,36 +474,49 @@ const ytd_browse_check = (main, clear_flag = true) => {
                 main,
                 clear_flag && main.tagName !== "YTD-WATCH-FLEXY"
             );
-            const observer = new MutationObserver((records) => {
-                records.forEach((record) => {
-                    if (record.attributeName === "role") {
-                        if (
-                            record.target.getAttribute(record.attributeName) ===
-                            "main"
-                        ) {
-                            observer_list_all_remove();
-                            manager_check(record.target);
-                        }
-                    }
-                });
-            });
-            observer.observe(main, observe_option_attributes);
             break;
     }
 };
 const filter_setup = () => {
-    var page_manager = document.querySelector("ytd-page-manager");
-    page_manager.childNodes.forEach((add) => {
-        ytd_browse_check(add, false);
-    });
-    const observer = new MutationObserver((records) => {
-        records.forEach((record) => {
-            record.addedNodes.forEach((add) => {
-                ytd_browse_check(add);
+    var ytd_app = document.querySelector(`ytd-app`);
+    var progress_tag = `yt-page-navigation-progress`;
+    var progress = ytd_app.querySelector(progress_tag);
+    const set_prgob = () => {
+        var loading = false;
+        const observer = new MutationObserver((records) => {
+            records.forEach((record) => {
+                var abn = record.attributeName;
+                if (abn === "aria-valuenow") {
+                    if (record.target.getAttribute(abn) === "100") {
+                        ytd_browse_check(
+                            document.querySelector(`[role="main"]`),
+                            true
+                        );
+                    }
+                }
             });
         });
-    });
-    observer.observe(page_manager, observe_option_childList);
+        observer.observe(progress, observe_option_attributes);
+    };
+    ytd_browse_check(document.querySelector(`[role="main"]`), true);
+    if (progress) {
+        set_prgob();
+    } else {
+        (() => {
+            const observer = new MutationObserver((records) => {
+                progress = ytd_app.querySelector(progress_tag);
+                if (progress) {
+                    ytd_browse_check(
+                        document.querySelector(`[role="main"]`),
+                        true
+                    );
+                    set_prgob();
+                    observer.disconnect();
+                }
+            });
+            observer.observe(ytd_app, observe_option_childList);
+        })();
+    }
 };
 function set_filters(v) {
     filters = v;
