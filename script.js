@@ -466,6 +466,7 @@ const manager_check = (main, clear_flag = true) => {
     }
 };
 const ytd_browse_check = (main, clear_flag = true) => {
+    if (!main) return;
     switch (main.tagName) {
         case "YTD-BROWSE":
         case "YTD-SEARCH":
@@ -481,24 +482,23 @@ const filter_setup = () => {
     var ytd_app = document.querySelector(`ytd-app`);
     var progress_tag = `yt-page-navigation-progress`;
     var progress = ytd_app.querySelector(progress_tag);
+    const main_chk = () => {
+        ytd_browse_check(document.querySelector(`[role="main"]`), true);
+    };
     const set_prgob = () => {
-        var loading = false;
+        main_chk();
         const observer = new MutationObserver((records) => {
             records.forEach((record) => {
                 var abn = record.attributeName;
                 if (abn === "aria-valuenow") {
                     if (record.target.getAttribute(abn) === "100") {
-                        ytd_browse_check(
-                            document.querySelector(`[role="main"]`),
-                            true
-                        );
+                        main_chk();
                     }
                 }
             });
         });
         observer.observe(progress, observe_option_attributes);
     };
-    ytd_browse_check(document.querySelector(`[role="main"]`), true);
     if (progress) {
         set_prgob();
     } else {
@@ -506,10 +506,6 @@ const filter_setup = () => {
             const observer = new MutationObserver((records) => {
                 progress = ytd_app.querySelector(progress_tag);
                 if (progress) {
-                    ytd_browse_check(
-                        document.querySelector(`[role="main"]`),
-                        true
-                    );
                     set_prgob();
                     observer.disconnect();
                 }
