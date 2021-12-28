@@ -1,27 +1,29 @@
 [
     {
-        "channel": ["all"],
         "title": ["迷惑系"],
         "url": ["/feed"],
-        "effect": ["hidden"]
+        "effect": "hidden"
     },
     {
-        "channel": ["all"],
         "title": ["閲覧注意"],
-        "effect": ["0.7"]
+        "effect": "0.7"
     },
-    { "channel": ["公式", "/official/i", "verified"], "effect": ["#edf10f26"] },
+    {
+        "channel": ["公式", "/official/i", "verified"],
+        "url": ["-^/c"],
+        "effect": "#edf10f26"
+    },
     { "title": ["おすすめ レビュー"], "effect": ["#fd28322b"] },
     {
-        "title": ["live_now"],
-        "effect": ["#ff323233"]
+        "title": "live_now",
+        "effect": "#ff323233"
     },
     {
         "title": ["scheduled", "premieres"],
-        "effect": ["#ff32321a"]
+        "effect": "#ff32321a"
     },
     {
         "title": ["streamed", "viewed"],
-        "effect": ["0.6"]
+        "effect": "0.6"
     }
 ]

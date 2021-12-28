@@ -254,7 +254,7 @@ function video_filter(video_renderer) {
     }
 }
 const video_check = (video) => {
-    if (video.hidden || video.tagName.match(/continuation|shelf-renderer/i))
+    if (video.hidden || !video.tagName.match(/(video|item)(|-section)-renderer/i))
         return;
     var overlays = video.querySelector(`#overlays`);
     if (overlays && overlays.childElementCount === 0) {
