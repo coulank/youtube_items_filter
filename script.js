@@ -138,7 +138,7 @@ function video_filter(video_renderer) {
                                         ? live_regexp.live
                                         : live_regexp.premiere;
                                     var live_elm = video_renderer.querySelector(
-                                        `.badge-style-type-live-now`
+                                        `.badge-style-type-live-now, [overlay-style="LIVE"]`
                                     );
                                     if (live_elm) {
                                         result = Boolean(
@@ -254,7 +254,10 @@ function video_filter(video_renderer) {
     }
 }
 const video_check = (video) => {
-    if (video.hidden || !video.tagName.match(/(video|item)(|-section)-renderer/i))
+    if (
+        video.hidden ||
+        !video.tagName.match(/(video|item)(|-section)-renderer/i)
+    )
         return;
     var overlays = video.querySelector(`#overlays`);
     if (overlays && overlays.childElementCount === 0) {
@@ -525,11 +528,16 @@ function set_filters(v) {
                 default:
                     if (!Array.isArray(filter[k])) {
                         filters[key][k] = [filter[k]];
+                    } else {
+                        filters[key][k] = filters[key][k].sort((a, b) => {
+                            return a.match(/^[!\-]/) ? -1 : 0;
+                        });
                     }
                     break;
             }
         });
     });
+    console.log(filters);
 }
 function main() {
     fetch(chrome.extension.getURL("assets/filters.json"))
