@@ -55,6 +55,20 @@ function video_filter(video_renderer) {
     var meta_elm = video_renderer.querySelector(`#metadata-line`);
     var effect_add = false;
     var hidden = false;
+    var style_object = video_renderer.style;
+    var h2_style_object = null;
+    if (video_renderer.querySelector("#subscribe-button ytd-button-renderer")) {
+        var set_renderer = video_renderer.querySelector("ytd-video-renderer");
+        if (set_renderer) {
+            style_object = set_renderer.style;
+        }
+        var img_ctn = video_renderer.querySelector(
+            "#title-container #image-container"
+        );
+        if (img_ctn) {
+            h2_style_object = img_ctn.style;
+        }
+    }
 
     (filters || []).some((filter) => {
         var fromnot = null;
@@ -225,29 +239,30 @@ function video_filter(video_renderer) {
                 var a_effect_add = true;
                 if (a_effect.match(/^hidden$/i)) {
                     if (hidden_continue++ < 14) {
-                        video_renderer.style.display = "none";
+                        style_object.display = "none";
+                        if (h2_style_object) h2_style_object.display = "none";
                     } else {
-                        if (Number(video_renderer.style.opacity) > 0.01) {
-                            video_renderer.style.opacity = "0.01";
+                        if (Number(style_object.opacity) > 0.01) {
+                            style_object.opacity = "0.01";
                         }
                     }
                     hidden = true;
                     effect_add = true;
                     return true;
                 } else if (hidden && a_effect.match(/^show$/i)) {
-                    video_renderer.style.display = "";
+                    style_object.display = "";
                 } else if (!hidden) {
                     // 数字だけは透明度、英数字は背景色になる
                     if (a_effect.match(/^[.\d]+/i)) {
                         if (a_effect === ".") {
-                            video_renderer.style.opacity = "";
+                            style_object.opacity = "";
                         } else {
-                            video_renderer.style.opacity = a_effect;
+                            style_object.opacity = a_effect;
                         }
                     } else if (a_effect.match(/^#?\w+/i)) {
-                        video_renderer.style.backgroundColor = a_effect;
+                        style_object.backgroundColor = a_effect;
                     } else if (a_effect === "#") {
-                        video_renderer.style.backgroundColor = "";
+                        style_object.backgroundColor = "";
                     } else {
                         a_effect_add = false;
                     }
@@ -255,12 +270,12 @@ function video_filter(video_renderer) {
                 }
             });
         }
-        var opc = video_renderer.style.opacity;
+        var opc = style_object.opacity;
         if (opc !== "" && Number(opc) <= 0.01) {
-            video_renderer.style.pointerEvents = "none";
+            style_object.pointerEvents = "none";
         } else {
-            if (video_renderer.style.pointerEvents !== "") {
-                video_renderer.style.pointerEvents = "";
+            if (style_object.pointerEvents !== "") {
+                style_object.pointerEvents = "";
             }
         }
         if (hidden) return true;
@@ -321,6 +336,7 @@ const add_contents_check = (ytb_contents, hidden_pass = true) => {
     video_list.forEach((video) => {
         video_check(video);
     });
+    load_hidden_element_remove();
 };
 const items_check = (target) => {
     if (!target) return;
@@ -527,7 +543,6 @@ const filter_setup = () => {
                 progress = ytd_app.querySelector(progress_tag);
                 if (progress) {
                     set_prgob();
-                    load_hidden_element_remove();
                     observer.disconnect();
                 }
             });
@@ -576,7 +591,7 @@ function main() {
         .finally(() => {
             setTimeout(() => {
                 load_hidden_element_remove();
-            }, 5000);
+            }, 10000);
         });
 }
 (() => {
