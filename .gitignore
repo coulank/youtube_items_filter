@@ -1,2 +1,2 @@
-filters.json
-filters copy*json
+/assets/*filters*.json
+!/assets/*filters*sample*.json
