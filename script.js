@@ -28,6 +28,14 @@ var live_regexp = {
     premieres: /premieres|プレミア公開/i,
 };
 
+var load_hidden_element = null;
+function load_hidden_element_remove() {
+    if (load_hidden_element) {
+        load_hidden_element.remove();
+        load_hidden_element = null;
+    }
+}
+
 function video_filter(video_renderer) {
     var channel_header = document.querySelector(
         `[role="main"] #channel-header-container`
@@ -219,8 +227,9 @@ function video_filter(video_renderer) {
                     if (hidden_continue++ < 14) {
                         video_renderer.style.display = "none";
                     } else {
-                        video_renderer.style.opacity = "0.01";
-                        video_renderer.style.pointerEvents = "none";
+                        if (Number(video_renderer.style.opacity) > 0.01) {
+                            video_renderer.style.opacity = "0.01";
+                        }
                     }
                     hidden = true;
                     effect_add = true;
@@ -245,6 +254,14 @@ function video_filter(video_renderer) {
                     if (a_effect_add) effect_add = true;
                 }
             });
+        }
+        var opc = video_renderer.style.opacity;
+        if (opc !== "" && Number(opc) <= 0.01) {
+            video_renderer.style.pointerEvents = "none";
+        } else {
+            if (video_renderer.style.pointerEvents !== "") {
+                video_renderer.style.pointerEvents = "";
+            }
         }
         if (hidden) return true;
     });
@@ -510,6 +527,7 @@ const filter_setup = () => {
                 progress = ytd_app.querySelector(progress_tag);
                 if (progress) {
                     set_prgob();
+                    load_hidden_element_remove();
                     observer.disconnect();
                 }
             });
@@ -554,6 +572,23 @@ function main() {
             } else {
                 console.error(e);
             }
+        })
+        .finally(() => {
+            setTimeout(() => {
+                load_hidden_element_remove();
+            }, 5000);
         });
 }
+(() => {
+    if (!document.location.href.match(/\/watch/)) {
+        var html = document.querySelector("html");
+        var head_observer = new MutationObserver((records) => {
+            head_observer.disconnect();
+            load_hidden_element = document.createElement("style");
+            load_hidden_element.innerText = `ytd-page-manager {opacity:0; pointer-events: none;}`;
+            document.head.appendChild(load_hidden_element);
+        });
+        head_observer.observe(html, observe_option_childList);
+    }
+})();
 document.addEventListener("DOMContentLoaded", main, false);
