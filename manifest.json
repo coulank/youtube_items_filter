@@ -1,8 +1,8 @@
 {
     "name": "YouTube Items Filter",
     "author": "綿風コウラン",
-    "version": "1.4.2",
-    "manifest_version": 2,
+    "version": "1.4.3",
+    "manifest_version": 3,
     "description": "YouTubeの動画一覧をフィルタリングすることができます",
     "content_scripts": [
         {

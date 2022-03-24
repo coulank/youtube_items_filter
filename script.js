@@ -570,7 +570,7 @@ function set_filters(v) {
             }
         });
     });
-    console.log(filters);
+    // console.log(filters);
 }
 function main() {
     fetch(chrome.extension.getURL("assets/filters.json"))
@@ -578,8 +578,10 @@ function main() {
             return r.json();
         })
         .then((v) => {
-            set_filters(v);
-            filter_setup();
+            if (!document.location.href.match(/\/live_chat/)) {
+                set_filters(v);
+                filter_setup();
+            }
         })
         .catch((e) => {
             if (e.message.match(/failed.*fetch/i)) {
