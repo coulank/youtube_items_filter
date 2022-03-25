@@ -6,12 +6,15 @@
     "description": "YouTubeの動画一覧をフィルタリングすることができます",
     "content_scripts": [
         {
-            "matches": [ "https://www.youtube.com/*" ],
+            "matches": ["https://www.youtube.com/*"],
             "js": ["script.js"],
             "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [
-        "assets/*"
+        {
+            "resources": ["assets/*"],
+            "matches": ["<all_urls>"]
+        }
     ]
 }

@@ -28,6 +28,22 @@ var live_regexp = {
     premieres: /premieres|プレミア公開/i,
 };
 
+function createRegExp(
+    str = "",
+    delimiter = "/",
+    option = "",
+    forceReg = false
+) {
+    let re = `${delimiter}^\/(.+)\/(\w*)$${delimiter}`;
+    let m = str.match(new RegExp(re, "i"));
+    if (m) {
+        if (option === "") option = m[2];
+        return new RegExp(m[1], option);
+    } else {
+        return forceReg ? new RegExp(m[1], option) : str;
+    }
+}
+
 var load_hidden_element = null;
 function load_hidden_element_remove() {
     if (load_hidden_element) {
@@ -87,9 +103,7 @@ function video_filter(video_renderer) {
                     if (a_channel.match(verified_regexp)) {
                         result = verified;
                     } else {
-                        var match_key = a_channel.match(/^\/.+\/\w*$/i)
-                            ? eval(a_channel)
-                            : a_channel;
+                        var match_key = createRegExp(a_channel);
                         result = Boolean(channel_name.match(match_key));
                     }
                     if (not) {
@@ -174,9 +188,7 @@ function video_filter(video_renderer) {
                         } else if (a_title.match(viewed_regexp)) {
                             result = viewed;
                         } else {
-                            var match_key = a_title.match(/^\/.+\/\w*$/i)
-                                ? eval(a_title)
-                                : a_title;
+                            var match_key = createRegExp(a_title);
                             result = Boolean(title_name.match(match_key));
                         }
                         if (not) {
@@ -573,7 +585,7 @@ function set_filters(v) {
     // console.log(filters);
 }
 function main() {
-    fetch(chrome.extension.getURL("assets/filters.json"))
+    fetch(chrome.runtime.getURL("assets/filters.json"))
         .then((r) => {
             return r.json();
         })
