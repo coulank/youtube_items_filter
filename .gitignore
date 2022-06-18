@@ -1,2 +1,2 @@
-/assets/*filters*.json
-!/assets/*filters*sample*.json
+resources/*filters*.json
+!resources/*filters*sample*.json
