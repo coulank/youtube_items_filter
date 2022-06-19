@@ -3,6 +3,7 @@ const idi = "fs";
 var rewrite_flag = false;
 var title_elm = document.querySelector("title");
 const ul = document.querySelector("#editArea > ul");
+var toast_elm = document.querySelector("#toast");
 
 const yif_json = "yif_json";
 function csGet(key, func, notfunc = () => {}) {
@@ -36,12 +37,25 @@ function UlLiToList() {
     });
     return list;
 }
+function setToast(message = "", time = null) {
+    toast_elm.classList.remove("runToast");
+    (async () => {
+        if (time === null) {
+            toast_elm.style.setProperty("--toast-time", "");
+        } else {
+            toast_elm.style.setProperty("--toast-time", time);
+        }
+        toast_elm.innerHTML = `<span>${message}</span>`;
+        toast_elm.classList.add("runToast");
+    })();
+}
 function _funcSave(obj) {
     if (obj.length > 0) {
         chrome.storage.sync.set({ [yif_json]: JSON.stringify(obj) });
     } else {
         chrome.storage.sync.remove(yif_json);
     }
+    setToast("Saved!");
     rewriteUpdate(false);
 }
 function funcSave() {
@@ -63,8 +77,7 @@ function funcImport() {
             var ec = "UTF-8";
             rd.readAsText(file, ec);
             rd.onload = (e) => {
-                _funcSave(JSON.parse(rd.result));
-                funcEditUpdate();
+                funcEditUpdate(JSON.parse(rd.result));
             };
         });
         document.head.appendChild(f);
@@ -72,16 +85,33 @@ function funcImport() {
     }
 }
 function funcExport() {
-    funcSave();
-    csGet(yif_json, (v) => {
-        var sn = "filters.json";
-        var text = v;
-        var b = new Blob([text], { type: "text/plane" });
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(b);
-        a.download = sn;
-        a.click();
-    });
+    var sn = "filters.json";
+    var text = JSON.stringify(UlLiToList(), null, 4);
+    var b = new Blob([text], { type: "text/plane" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(b);
+    a.download = sn;
+    a.click();
+}
+function elemOlLi(obj_value = "") {
+    var li = document.createElement("li");
+    var lin = document.createElement("input");
+    lin.value = obj_value;
+    lin.classList.add("value");
+    lin.onchange = (e) => {
+        rewriteUpdate(true);
+    };
+    li.appendChild(lin);
+    var minus = document.createElement("input");
+    minus.type = "button";
+    minus.classList.add("minus");
+    minus.value = "－";
+    minus.onclick = (e) => {
+        rewriteUpdate(true);
+        li.remove();
+    };
+    li.appendChild(minus);
+    return li;
 }
 function elemUlLi(obj = {}) {
     var li = document.createElement("li");
@@ -93,6 +123,25 @@ function elemUlLi(obj = {}) {
         li.remove();
     };
     li.appendChild(close);
+    var moveUp = document.createElement("div");
+    moveUp.classList.add("button", "move", "up");
+    moveUp.onclick = (e) => {
+        rewriteUpdate(true);
+        var list = [].slice.call(li.parentElement.children);
+        li.parentElement.insertBefore(li, list[list.indexOf(li) - 1]);
+    };
+    li.appendChild(moveUp);
+    var moveDown = document.createElement("div");
+    moveDown.classList.add("button", "move", "down");
+    moveDown.onclick = (e) => {
+        rewriteUpdate(true);
+        var list = [].slice.call(li.parentElement.children);
+        li.parentElement.insertBefore(
+            li,
+            list[list.indexOf(li) + 1].nextSibling
+        );
+    };
+    li.appendChild(moveDown);
     ["channel", "title", "url", "effect"].forEach((key) => {
         var cell = document.createElement("div");
         cell.classList.add("cell");
@@ -119,26 +168,6 @@ function elemUlLi(obj = {}) {
         cell.appendChild(plus);
         li.appendChild(cell);
     });
-    return li;
-}
-function elemOlLi(obj_value = "") {
-    var li = document.createElement("li");
-    var lin = document.createElement("input");
-    lin.value = obj_value;
-    lin.classList.add("value");
-    lin.onchange = (e) => {
-        rewriteUpdate(true);
-    };
-    li.appendChild(lin);
-    var minus = document.createElement("input");
-    minus.type = "button";
-    minus.classList.add("minus");
-    minus.value = "－";
-    minus.onclick = (e) => {
-        rewriteUpdate(true);
-        li.remove();
-    };
-    li.appendChild(minus);
     return li;
 }
 function funcEditUpdate(json = null) {
@@ -176,7 +205,7 @@ function rewriteUpdate(ast = true) {
     titleUpdate(ast);
 }
 function BeforeCloseEvent() {
-    if (!rewrite_flag || confirm("Don't Save, Continue?")) {
+    if (!rewrite_flag || confirm("Don't save, continue?")) {
         return true;
     }
     return false;
@@ -185,14 +214,18 @@ window.onbeforeunload = (e) => {
     if (rewrite_flag) return true;
 };
 function funcDelete() {
-    funcEditUpdate([]);
+    if (confirm("Run delete, really?")) {
+        funcEditUpdate([]);
+    }
 }
 function funcSample() {
-    fetch("resources/filters-sample.json")
-        .then((r) => r.json())
-        .then((data) => {
-            funcEditUpdate(data);
-        });
+    if (confirm("Run load sample, really?")) {
+        fetch("resources/filters-sample.json")
+            .then((r) => r.json())
+            .then((data) => {
+                funcEditUpdate(data);
+            });
+    }
 }
 
 document.querySelector("#save").addEventListener("click", funcSave);

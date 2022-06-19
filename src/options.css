@@ -1,10 +1,18 @@
+:root {
+    --color: black;
+    --background-color: white;
+    --list-color: rgb(248, 248, 248);
+    --shadow-color-a: rgba(0, 0, 0, 0.1);
+    --shadow-color-b: rgba(0, 0, 0, 0.05);
+    --toast-time-default: 1s;
+}
 body {
     padding: 0;
     margin: 0;
 }
 * {
-    color: black;
-    background-color: white;
+    color: var(--color);
+    background-color: var(--background-color);
     font-size: 14px;
     font-family: Roboto, Noto, sans-serif;
     position: relative;
@@ -22,6 +30,9 @@ ul#youtubeExensionMenu > li {
     margin: 16px auto;
     padding: 0;
 }
+#editArea > ul > li > .button {
+    z-index: 1;
+}
 #editArea > ul > li > .close {
     font-size: 2em;
     position: absolute;
@@ -37,12 +48,50 @@ ul#youtubeExensionMenu > li {
 #editArea > ul > li > .close:hover {
     opacity: 0.6;
 }
+#editArea > ul > li > .button.move {
+    border-color: var(--shadow-color-a);
+    position: absolute;
+    left: 0;
+    opacity: 0.6;
+    font-size: 2em;
+    display: block;
+    width: auto;
+    margin: 8px 18px;
+    padding: 0;
+    transition: 100ms;
+}
+#editArea > ul > li > .button.move:hover {
+    opacity: 1;
+}
+#editArea > ul > li > .button.move.up {
+    top: 0;
+    border-right: 16px solid transparent;
+    border-left: 16px solid transparent;
+    border-bottom-width: 16px;
+    border-bottom-style: solid;
+}
+#editArea > ul > li:first-child > .button.move.up,
+#editArea > ul > li:last-child > .button.move.down {
+    display: none;
+}
+#editArea > ul > li > .button.move.down {
+    bottom: 0;
+    border-right: 16px solid transparent;
+    border-left: 16px solid transparent;
+    border-top-width: 16px;
+    border-top-style: solid;
+}
+#editArea > ul > li > .preview {
+    position: absolute;
+    right: 0;
+    width: 20px;
+}
 
 ul:not(#youtubeExensionMenu) > li {
     width: auto;
     display: flex;
-    background-color: rgb(81, 81, 81);
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+    background-color: var(--list-color);
+    box-shadow: 5px 5px 5px var(--shadow-color-a);
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-evenly;
@@ -91,7 +140,7 @@ ol > li:not(:last-child) {
 }
 ul > li input {
     border: 0;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: var(--shadow-color-b);
     border-radius: 4px;
     padding: 4px 16px;
 }
@@ -104,7 +153,7 @@ input.ulLiAdd {
     font-size: 2em;
 }
 ul > li input:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--shadow-color-a);
 }
 textarea {
     width: 80%;
@@ -113,10 +162,66 @@ textarea {
 .button {
     cursor: pointer;
 }
+@keyframes toast {
+    0% {
+        visibility: visible;
+        opacity: 0;
+    }
+    10% {
+        visibility: visible;
+        opacity: 1;
+    }
+    90% {
+        visibility: visible;
+        opacity: 1;
+    }
+    99% {
+        visibility: visible;
+        opacity: 0;
+    }
+    100% {
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+#toast {
+    z-index: 2;
+    right: 0;
+    left: 0;
+    position: fixed;
+    background-color: transparent;
+    visibility: hidden;
+    display: flex;
+    justify-content: center;
+    --toast-time: var(--toast-time-default);
+}
+#toast.runToast {
+    visibility: visible;
+    animation-name: toast;
+    animation-duration: var(--toast-time);
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+#toast.fadeOut {
+    animation-name: fadeOut;
+    animation-duration: 100ms;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+#toast > * {
+    background-color: var(--list-color);
+    display: flex;
+    padding: 9px 32px;
+    border-radius: 4px;
+    box-shadow: 5px 5px 5px var(--shadow-color-a);
+}
 
 @media (prefers-color-scheme: dark) {
-    * {
-        color: white;
-        background-color: #393939;
+    :root {
+        --color: white;
+        --background-color: #393939;
+        --list-color: rgb(81, 81, 81);
+        --shadow-color-a: rgba(0, 0, 0, 0.2);
+        --shadow-color-b: rgba(0, 0, 0, 0.3);
     }
 }

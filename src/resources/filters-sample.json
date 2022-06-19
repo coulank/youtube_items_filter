@@ -1,19 +1,19 @@
 [
     {
-        "title": ["迷惑系"],
+        "title": ["hide", "隠す"],
         "url": ["/feed"],
         "effect": "hidden"
     },
     {
-        "title": ["閲覧注意"],
+        "title": ["quiet", "薄める"],
         "effect": "0.7"
     },
     {
-        "channel": ["公式", "/official/i", "verified"],
+        "channel": ["/official/i", "公式", "verified"],
         "url": ["-^/c"],
         "effect": "#edf10f26"
     },
-    { "title": ["おすすめ レビュー"], "effect": ["#fd28322b"] },
+    { "title": ["/recommend/i", "おすすめ"], "effect": ["#fd28322b"] },
     {
         "title": "live_now",
         "effect": "#ff323233"
