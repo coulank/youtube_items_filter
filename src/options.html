@@ -7,7 +7,7 @@
 </head>
 
 <body id="youtubeExtensionBody">
-    <div id="toast"><span></span></div>
+    <div id="toast"></div>
     <ul id="youtubeExensionMenu">
         <li>
             <h1>YouTube Items Filters</h1>
@@ -29,13 +29,14 @@
     </ul>
     <div id="svg_data" style="display:none">
         <div id="ytb_preview">
-            <svg width="160" height="153" viewBox="0 0 160 153" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="160" height="90" fill="black" />
-                <path d="M105 45L61 20V70" fill="white" />
-                <rect x="9" y="96" width="134" height="30" fill="black" />
-                <rect x="9" y="130" width="103" height="10" fill="black" />
-                <rect x="148" y="94" width="6" height="12" fill="black" />
-                <rect x="9" y="143" width="103" height="10" fill="black" />
+            <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="160" height="90" fill="#808080" />
+                <path d="M105 45L61 20V70" fill="white" fill-opacity="0.5" />
+                <path class="title" fill-rule="evenodd" clip-rule="evenodd"
+                    d="M143 97H5V108H143V97ZM143 112H5V123H143V112Z" fill="black" fill-opacity="0.5" />
+                <rect class="channel" x="5" y="130" width="106" height="10" fill="black" fill-opacity="0.25" />
+                <rect x="148" y="94" width="6" height="12" fill="black" fill-opacity="0.5" />
+                <rect x="5" y="143" width="106" height="10" fill="black" fill-opacity="0.25" />
             </svg>
         </div>
     </div>

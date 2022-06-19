@@ -2,8 +2,9 @@
     --color: black;
     --background-color: white;
     --list-color: rgb(248, 248, 248);
-    --shadow-color-a: rgba(0, 0, 0, 0.1);
-    --shadow-color-b: rgba(0, 0, 0, 0.05);
+    --shadow-color-a: rgba(0, 0, 0, 0.2);
+    --shadow-color-b: rgba(0, 0, 0, 0.1);
+    --scroll-color: var(--shadow-color-a);
     --toast-time-default: 1s;
 }
 body {
@@ -82,9 +83,20 @@ ul#youtubeExensionMenu > li {
     border-top-style: solid;
 }
 #editArea > ul > li > .preview {
+    margin: 8px;
     position: absolute;
     right: 0;
-    width: 20px;
+    bottom: 0;
+    width: auto;
+    display: block;
+}
+#editArea > ul > li > .preview > svg {
+    margin: 0;
+    width: 40px;
+    height: auto;
+}
+#editArea > ul > li > .preview > svg [fill="black"] {
+    fill: var(--color);
 }
 
 ul:not(#youtubeExensionMenu) > li {
@@ -210,10 +222,12 @@ textarea {
 }
 #toast > * {
     background-color: var(--list-color);
-    display: flex;
     padding: 9px 32px;
     border-radius: 4px;
     box-shadow: 5px 5px 5px var(--shadow-color-a);
+}
+#toast > * > * {
+    background-color: transparent;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -223,5 +237,25 @@ textarea {
         --list-color: rgb(81, 81, 81);
         --shadow-color-a: rgba(0, 0, 0, 0.2);
         --shadow-color-b: rgba(0, 0, 0, 0.3);
+        --scroll-color: var(--list-color);
     }
+}
+
+body {
+    overflow-y: scroll;
+}
+body::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+.mobile body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+body::-webkit-scrollbar-track {
+    background: var(--background-color);
+}
+body::-webkit-scrollbar-thumb {
+    background: var(--scroll-color);
+    border-radius: 5px;
 }

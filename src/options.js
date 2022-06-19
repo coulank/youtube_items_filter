@@ -4,6 +4,8 @@ var rewrite_flag = false;
 var title_elm = document.querySelector("title");
 const ul = document.querySelector("#editArea > ul");
 var toast_elm = document.querySelector("#toast");
+var ytb_preview_elm = document.querySelector("#ytb_preview");
+var undo = null;
 
 const yif_json = "yif_json";
 function csGet(key, func, notfunc = () => {}) {
@@ -39,15 +41,16 @@ function UlLiToList() {
 }
 function setToast(message = "", time = null) {
     toast_elm.classList.remove("runToast");
-    (async () => {
+    toast_elm.innerHTML = `<div>${message}</div>`;
+    setTimeout(() => {
         if (time === null) {
             toast_elm.style.setProperty("--toast-time", "");
         } else {
             toast_elm.style.setProperty("--toast-time", time);
         }
-        toast_elm.innerHTML = `<span>${message}</span>`;
         toast_elm.classList.add("runToast");
-    })();
+    }, 0);
+    return toast_elm;
 }
 function _funcSave(obj) {
     if (obj.length > 0) {
@@ -93,13 +96,47 @@ function funcExport() {
     a.download = sn;
     a.click();
 }
+function updatePreview(UlLi) {
+    var preview_plm = UlLi.querySelector(".preview");
+    preview_plm.innerHTML = ytb_preview_elm.innerHTML;
+    var preview = preview_plm.querySelector("svg");
+    var effects = UlLi.querySelectorAll(
+        `[data-key="effect"] ol li input.value`
+    );
+    effects.forEach((e) => {
+        var value = e.value;
+        if (value.match(/^hidden/)) {
+            switch (value) {
+                case "hidden":
+                    preview.style.display = "none";
+                    break;
+                case "hidden_title":
+                    preview.querySelector(".title").style.visibility = "hidden";
+                    break;
+                case "hidden_channel":
+                    preview.querySelector(".channel").style.visibility =
+                        "hidden";
+                    break;
+            }
+        } else if (value.match(/^\d*\.?\d$/)) {
+            preview.style.opacity = value;
+        } else {
+            preview.style.backgroundColor = value;
+        }
+    });
+}
 function elemOlLi(obj_value = "") {
     var li = document.createElement("li");
     var lin = document.createElement("input");
     lin.value = obj_value;
     lin.classList.add("value");
     lin.onchange = (e) => {
+        var ol = li.parentElement;
+        var pl = ol.parentElement;
         rewriteUpdate(true);
+        if (pl.dataset.key === "effect") {
+            updatePreview(pl.parentElement);
+        }
     };
     li.appendChild(lin);
     var minus = document.createElement("input");
@@ -107,8 +144,13 @@ function elemOlLi(obj_value = "") {
     minus.classList.add("minus");
     minus.value = "－";
     minus.onclick = (e) => {
+        var ol = li.parentElement;
+        var pl = ol.parentElement;
         rewriteUpdate(true);
         li.remove();
+        if (pl.dataset.key === "effect") {
+            updatePreview(pl.parentElement);
+        }
     };
     li.appendChild(minus);
     return li;
@@ -119,6 +161,13 @@ function elemUlLi(obj = {}) {
     close.classList.add("button", "close");
     close.innerText = "✕";
     close.onclick = (e) => {
+        undo = UlLiToList();
+        setToast(`<div>Deleted.</div><a href="">Undo</a>`, "5s");
+        toast_elm.querySelector("a").onclick = () => {
+            funcEditUpdate(undo);
+            toast_elm.classList.remove("runToast");
+            return false;
+        };
         rewriteUpdate(true);
         li.remove();
     };
@@ -142,6 +191,10 @@ function elemUlLi(obj = {}) {
         );
     };
     li.appendChild(moveDown);
+    var preview = document.createElement("div");
+    preview.classList.add("preview");
+    preview.innerHTML = ytb_preview_elm.innerHTML;
+    li.appendChild(preview);
     ["channel", "title", "url", "effect"].forEach((key) => {
         var cell = document.createElement("div");
         cell.classList.add("cell");
@@ -168,6 +221,7 @@ function elemUlLi(obj = {}) {
         cell.appendChild(plus);
         li.appendChild(cell);
     });
+    updatePreview(li);
     return li;
 }
 function funcEditUpdate(json = null) {
