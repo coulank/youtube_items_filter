@@ -1,0 +1,122 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+* {
+    color: black;
+    background-color: white;
+    font-size: 14px;
+    font-family: Roboto, Noto, sans-serif;
+    position: relative;
+}
+h1 {
+    font-size: 30px;
+}
+ul#youtubeExensionMenu {
+    max-width: 900px;
+    width: 100vw;
+}
+ul#youtubeExensionMenu > li {
+    width: 100%;
+    min-height: 60px;
+    margin: 16px auto;
+    padding: 0;
+}
+#editArea > ul > li > .close {
+    font-size: 2em;
+    position: absolute;
+    display: block;
+    width: auto;
+    margin: 8px;
+    padding: 0 10px;
+    top: 0;
+    right: 0;
+    opacity: 0.4;
+    transition: 100ms;
+}
+#editArea > ul > li > .close:hover {
+    opacity: 0.6;
+}
+
+ul:not(#youtubeExensionMenu) > li {
+    width: auto;
+    display: flex;
+    background-color: rgb(81, 81, 81);
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-evenly;
+}
+ul:not(#youtubeExensionMenu) > li > div {
+    margin: 4px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 44%;
+}
+ul:not(#youtubeExensionMenu) > li > div > * {
+    margin: 4px 0;
+}
+ul {
+    list-style: none;
+    margin: auto;
+    margin-top: 8px;
+    padding: 0;
+}
+ul > li {
+    border-radius: 8px;
+    margin: 16px 8px;
+    padding: 16px 0;
+    text-align: center;
+    display: table;
+}
+ul > li > * {
+    display: table-cell;
+    vertical-align: middle;
+}
+ul > li > div > span {
+    width: 40%;
+}
+ul > li > div > input.shortcut {
+    width: 30%;
+}
+input[type="button"] {
+    cursor: pointer;
+}
+ul > li * {
+    background-color: transparent;
+}
+ol > li:not(:last-child) {
+    margin-bottom: 4px;
+}
+ul > li input {
+    border: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 4px 16px;
+}
+input.minus {
+    padding: 2px 8px;
+    margin-left: 8px;
+}
+input.ulLiAdd {
+    padding: 4px 32px;
+    font-size: 2em;
+}
+ul > li input:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+textarea {
+    width: 80%;
+    height: 3em;
+}
+.button {
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    * {
+        color: white;
+        background-color: #393939;
+    }
+}

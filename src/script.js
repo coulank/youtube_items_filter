@@ -28,6 +28,17 @@ var live_regexp = {
     premieres: /premieres|プレミア公開/i,
 };
 
+const yif_json = "yif_json";
+function csGet(key, func, notfunc = () => {}) {
+    chrome.storage.sync.get(key, (e) => {
+        if (typeof e[key] === "string") {
+            func(e[key], key);
+        } else {
+            notfunc();
+        }
+    });
+}
+
 function createRegExp(
     str = "",
     delimiter = "/",
@@ -584,29 +595,22 @@ function set_filters(v) {
     });
     // console.log(filters);
 }
+
 function main() {
-    fetch(chrome.runtime.getURL("assets/filters.json"))
-        .then((r) => {
-            return r.json();
-        })
-        .then((v) => {
-            if (!document.location.href.match(/\/live_chat/)) {
-                set_filters(v);
+    if (!document.location.href.match(/\/live_chat/)) {
+        csGet(
+            yif_json,
+            (v) => {
+                set_filters(JSON.parse(v));
                 filter_setup();
-            }
-        })
-        .catch((e) => {
-            if (e.message.match(/failed.*fetch/i)) {
-                console.log("Please create assets/filters.json");
-            } else {
-                console.error(e);
-            }
-        })
-        .finally(() => {
-            setTimeout(() => {
+            },
+            () => {
                 load_hidden_element_remove();
-            }, 10000);
-        });
+            }
+        );
+    } else {
+        load_hidden_element_remove();
+    }
 }
 (() => {
     if (!document.location.href.match(/\/watch/)) {
@@ -619,5 +623,5 @@ function main() {
         });
         head_observer.observe(html, observe_option_childList);
     }
+    document.addEventListener("DOMContentLoaded", main, false);
 })();
-document.addEventListener("DOMContentLoaded", main, false);

@@ -1,2 +1,2 @@
-resources/*filters*.json
-!resources/*filters*sample*.json
+/src/resources/*filters*.json
+!/src/resources/*filters*sample*.json
