@@ -1,9 +1,9 @@
 {
     "name": "YouTube Items Filter",
     "author": "kouwtkz",
-    "version": "1.8.4",
+    "version": "1.8.5",
     "manifest_version": 3,
-    "description": "YouTubeの動画一覧をフィルタリングすることができます",
+    "description": "This is to filter YouTube video list.",
     "content_scripts": [
         {
             "matches": ["https://www.youtube.com/*"],
