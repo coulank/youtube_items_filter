@@ -3,9 +3,10 @@ const idi = "fs";
 var rewrite_flag = false;
 var title_elm = document.querySelector("title");
 const ul = document.querySelector("#editArea > ul");
-var toast_elm = document.querySelector("#toast");
-var ytb_preview_elm = document.querySelector("#ytb_preview");
+var toast_elm = document.getElementById("toast");
+var ytb_preview_elm = document.getElementById("ytb_preview");
 var undo = null;
+const ef_menu_elm = document.getElementById("effect-menu");
 
 const yif_json = "yif_json";
 function csGet(key, func, notfunc = () => {}) {
@@ -160,6 +161,14 @@ function elemOlLi(args = {}) {
         }
     };
     li.appendChild(lin);
+    if (key === "effect") {
+        var menu = document.createElement("input");
+        menu.type = "button";
+        menu.classList.add("pulldown");
+        menu.value = "▽";
+        menu.onclick = (e) => {};
+        li.appendChild(menu);
+    }
     var minus = document.createElement("input");
     minus.type = "button";
     minus.classList.add("minus");
@@ -385,12 +394,12 @@ document.body.onkeydown = (e) => {
     }
 };
 
-document.querySelector("#save").addEventListener("click", funcSave);
-document.querySelector("#save-button").addEventListener("click", funcSave);
-document.querySelector("#export").addEventListener("click", funcExport);
-document.querySelector("#import").addEventListener("click", funcImport);
-document.querySelector("#delete").addEventListener("click", funcDelete);
-document.querySelector("#sample").addEventListener("click", funcSample);
+document.getElementById("save").addEventListener("click", funcSave);
+document.getElementById("save-button").addEventListener("click", funcSave);
+document.getElementById("export").addEventListener("click", funcExport);
+document.getElementById("import").addEventListener("click", funcImport);
+document.getElementById("delete").addEventListener("click", funcDelete);
+document.getElementById("sample").addEventListener("click", funcSample);
 function smoothScroll(scroll) {
     document.firstChild.classList.add("smooth");
     setTimeout(() => {

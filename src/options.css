@@ -193,8 +193,32 @@ ul > li input {
     border-radius: 4px;
     padding: 4px 16px;
 }
+input.value {
+    width: 224px;
+}
+[data-key="effect"] input.value {
+    width: 190px;
+}
+[data-key="effect"] li input.pulldown {
+    width: 32px;
+    padding: 4px 4px;
+    margin-left: 2px;
+}
+#effect-menu {
+    position: absolute;
+    visibility: hidden;
+    width: 200px;
+    padding: 4px 8px;
+    background-color: var(--list-color);
+    border-radius: 4px;
+    box-shadow: 5px 5px 5px var(--shadow-color-a);
+}
+#effect-menu.show {
+    visibility: visible;
+}
 input.minus {
-    padding: 2px 8px;
+    width: 28px;
+    padding: 2px 4px;
     margin-left: 8px;
 }
 input.ulLiAdd {
