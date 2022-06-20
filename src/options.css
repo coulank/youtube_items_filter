@@ -1,6 +1,7 @@
 :root {
     --color: black;
     --background-color: white;
+    --sub-color: #7e7e7ee7;
     --list-color: rgb(248, 248, 248);
     --shadow-color-a: rgba(0, 0, 0, 0.2);
     --shadow-color-b: rgba(0, 0, 0, 0.1);
@@ -21,6 +22,13 @@ body {
     font-size: 14px;
     font-family: Roboto, Noto, sans-serif;
     position: relative;
+}
+input:focus,
+select:focus {
+    outline: 1px var(--sub-color) solid;
+}
+select:not([size]) option {
+    color: black;
 }
 h1 {
     font-size: 30px;
@@ -187,7 +195,8 @@ ul > li * {
 ol > li:not(:last-child) {
     margin-bottom: 4px;
 }
-ul > li input {
+li input,
+li select {
     border: 0;
     background-color: var(--shadow-color-b);
     border-radius: 4px;
@@ -204,17 +213,30 @@ input.value {
     padding: 4px 4px;
     margin-left: 2px;
 }
+[data-key="effect"] li.target input {
+    z-index: 11;
+}
 #effect-menu {
     position: absolute;
-    visibility: hidden;
-    width: 200px;
-    padding: 4px 8px;
+    display: none;
+}
+#effect-menu .menu {
+    width: 244px;
+    padding: 16px 8px;
+    z-index: 11;
     background-color: var(--list-color);
     border-radius: 4px;
-    box-shadow: 5px 5px 5px var(--shadow-color-a);
+    box-shadow: 1px 4px 5px var(--shadow-color-a);
 }
+#effect-menu .blur {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    /* background-color: rgba(255, 0, 0, 0.115); */
+}
+
 #effect-menu.show {
-    visibility: visible;
+    display: block;
 }
 input.minus {
     width: 28px;

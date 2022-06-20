@@ -7,6 +7,43 @@ var toast_elm = document.getElementById("toast");
 var ytb_preview_elm = document.getElementById("ytb_preview");
 var undo = null;
 const ef_menu_elm = document.getElementById("effect-menu");
+const ef_menu_form = ef_menu_elm.querySelector("form");
+ef_menu_form.effect_type.addEventListener("change", (e) => {
+    var lins = document.querySelectorAll(
+        `[data-key="effect"] li.target input.value`
+    );
+    var value = e.target.value;
+    var result = value;
+    switch (value.toLowerCase()) {
+        case "hidden":
+        case "hidden_title":
+        case "hidden_channel":
+            break;
+        default:
+            break;
+    }
+    lins.forEach((lin) => {
+        lin.value = result;
+        lin.onchange();
+    });
+});
+function efmExit() {
+    document.querySelectorAll(`[data-key="effect"] li.target`).forEach((li) => {
+        li.querySelectorAll(".pulldown").forEach((pulldown) => {
+            pulldown.value = "▽";
+        });
+        li.classList.remove("target");
+    });
+    if (ef_menu_elm.classList.contains("show")) {
+        ef_menu_elm.classList.remove("show");
+        return true;
+    } else {
+        return false;
+    }
+}
+ef_menu_elm.querySelector(".blur").addEventListener("click", () => {
+    efmExit();
+});
 
 const yif_json = "yif_json";
 function csGet(key, func, notfunc = () => {}) {
@@ -162,12 +199,31 @@ function elemOlLi(args = {}) {
     };
     li.appendChild(lin);
     if (key === "effect") {
-        var menu = document.createElement("input");
-        menu.type = "button";
-        menu.classList.add("pulldown");
-        menu.value = "▽";
-        menu.onclick = (e) => {};
-        li.appendChild(menu);
+        var pulldown = document.createElement("input");
+        pulldown.type = "button";
+        pulldown.classList.add("pulldown");
+        pulldown.value = "▽";
+        pulldown.onclick = (e) => {
+            if (li.classList.contains("target")) {
+                efmExit();
+            } else {
+                li.appendChild(ef_menu_elm);
+                pulldown.value = "△";
+                li.classList.add("target");
+                switch (lin.value.toLowerCase()) {
+                    case "hidden":
+                    case "hidden_title":
+                    case "hidden_channel":
+                        ef_menu_form.effect_type.value = lin.value;
+                        break;
+                    default:
+                        ef_menu_form.effect_type.value = "color";
+                        break;
+                }
+                ef_menu_elm.classList.add("show");
+            }
+        };
+        li.appendChild(pulldown);
     }
     var minus = document.createElement("input");
     minus.type = "button";
@@ -382,7 +438,7 @@ function funcSample() {
     }
 }
 document.body.onkeydown = (e) => {
-    if (e.ctrlKey && !e.altKey && !e.ShiftKey) {
+    if (e.ctrlKey && !e.altKey && !e.shiftKey) {
         switch (e.code) {
             case "KeyS":
                 funcSave();
@@ -391,6 +447,8 @@ document.body.onkeydown = (e) => {
                 funcImport();
                 return false;
         }
+    } else if (e.code === "Escape" && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+        return !efmExit();
     }
 };
 
