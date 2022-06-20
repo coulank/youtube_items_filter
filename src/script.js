@@ -67,10 +67,10 @@ function video_filter(video_renderer) {
     var channel_header = document.querySelector(
         `[role="main"] #channel-header-container`
     );
-    var channel_name = (
-        (channel_header || video_renderer).querySelector("#channel-name") ||
-        innerTextBlank
-    ).innerText;
+    var channel_elm = (channel_header || video_renderer).querySelector(
+        "#channel-name"
+    );
+    var channel_name = (channel_elm || innerTextBlank).innerText;
     var verified = Boolean(
         (channel_header || video_renderer).querySelector(
             ".badge-style-type-verified"
@@ -272,6 +272,18 @@ function video_filter(video_renderer) {
                     hidden = true;
                     effect_add = true;
                     return true;
+                } else if (a_effect.match(/^hidden/i)) {
+                    switch (a_effect.toLowerCase()) {
+                        case "hidden_title":
+                            if (title_elm !== null)
+                                title_elm.style.visibility = "hidden";
+                            break;
+                        case "hidden_channel":
+                            if (channel_elm !== null)
+                                channel_elm.style.visibility = "hidden";
+                            break;
+                    }
+                    style_object.display = "";
                 } else if (hidden && a_effect.match(/^show$/i)) {
                     style_object.display = "";
                 } else if (!hidden) {

@@ -6,6 +6,8 @@
     --shadow-color-b: rgba(0, 0, 0, 0.1);
     --scroll-color: var(--shadow-color-a);
     --toast-time-default: 1s;
+    --swap-time: 150ms;
+    scroll-behavior: smooth;
 }
 body {
     padding: 0;
@@ -99,14 +101,20 @@ ul#youtubeExensionMenu > li {
     fill: var(--color);
 }
 
+ul:not(#youtubeExensionMenu) {
+    margin: 0 8px;
+}
 ul:not(#youtubeExensionMenu) > li {
-    width: auto;
+    margin: 0;
+    margin-bottom: 20px;
+    width: 100%;
     display: flex;
     background-color: var(--list-color);
     box-shadow: 5px 5px 5px var(--shadow-color-a);
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-evenly;
+    transition: transform var(--swap-time);
 }
 ul:not(#youtubeExensionMenu) > li > div {
     margin: 4px 0;
@@ -258,4 +266,49 @@ body::-webkit-scrollbar-track {
 body::-webkit-scrollbar-thumb {
     background: var(--scroll-color);
     border-radius: 5px;
+}
+
+#to-top {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background-color: transparent;
+    z-index: 2;
+    border-right: 16px solid transparent;
+    border-left: 16px solid transparent;
+    border-bottom: 24px solid var(--shadow-color-a);
+    width: 0;
+    height: 0;
+    margin: 16px;
+    visibility: hidden;
+}
+#to-top:hover {
+    border-bottom: 24px solid var(--shadow-color-b);
+}
+#to-top.show {
+    visibility: visible;
+}
+
+#save-button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    margin: 16px;
+    background-color: transparent;
+}
+#save-button * {
+    background-color: transparent;
+}
+#save-button svg {
+    width: 8vw;
+    max-width: 128px;
+    min-width: 64px;
+    height: auto;
+}
+#save-button svg [fill="black"] {
+    fill: var(--shadow-color-a);
+}
+#save-button:hover svg [fill="black"] {
+    fill: var(--shadow-color-b);
 }
