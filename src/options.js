@@ -276,9 +276,16 @@ function elemUlLi(obj = {}) {
         cell.classList.add("cell");
         cell.dataset.key = key;
         var ctext = document.createElement("div");
-        ctext.innerText = `${key.replace(/^\w/, ($0) => {
-            return $0.toUpperCase();
-        })}`;
+        switch (key) {
+            case "url":
+                ctext.innerText = key.toUpperCase();
+                break;
+            default:
+                ctext.innerText = `${key.replace(/^\w/, ($0) => {
+                    return $0.toUpperCase();
+                })}`;
+                break;
+        }
         cell.appendChild(ctext);
         var ol = document.createElement("ol");
         var obj_list = obj[key] ? obj[key] : [];
