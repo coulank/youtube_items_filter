@@ -127,6 +127,14 @@ function updatePreview(UlLi) {
         }
     });
 }
+function getNum(str) {
+    var m = str.match(/(\d+|)/);
+    if (m) {
+        return Number(str.match(/\d+/)[0]);
+    } else {
+        return 0;
+    }
+}
 function getCssMilSec(elem, prop) {
     return Number(
         window
@@ -314,8 +322,16 @@ plus_ul.value = "＋";
 plus_ul.classList.add("ulLiAdd");
 plus_ul.onclick = (e) => {
     rewriteUpdate(true);
-    smoothScroll({ top: document.firstChild.scrollHeight });
-    ul.appendChild(elemUlLi());
+    var li = elemUlLi();
+    var li_style = getComputedStyle(li);
+    ul.appendChild(li);
+    smoothScroll({
+        type: "scrollBy",
+        top:
+            li.scrollHeight +
+            getNum(li_style.marginTop) +
+            getNum(li_style.marginBottom),
+    });
 };
 ul.parentElement.appendChild(plus_ul);
 funcEditUpdate();
@@ -372,7 +388,14 @@ document.querySelector("#sample").addEventListener("click", funcSample);
 function smoothScroll(scroll) {
     document.firstChild.classList.add("smooth");
     setTimeout(() => {
-        window.scrollTo(scroll);
+        switch ((scroll.type || "").toLowerCase()) {
+            case "scrollby":
+                window.scrollBy(scroll);
+                break;
+            default:
+                window.scrollTo(scroll);
+                break;
+        }
         setTimeout(() => {
             document.firstChild.classList.remove("smooth");
         });
