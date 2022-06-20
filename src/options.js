@@ -96,11 +96,12 @@ function funcExport() {
     a.download = sn;
     a.click();
 }
-function updatePreview(UlLi) {
-    var preview_plm = UlLi.querySelector(".preview");
+function updatePreview(ulLi) {
+    if (ulLi === null) return;
+    var preview_plm = ulLi.querySelector(".preview");
     preview_plm.innerHTML = ytb_preview_elm.innerHTML;
     var preview = preview_plm.querySelector("svg");
-    var effects = UlLi.querySelectorAll(
+    var effects = ulLi.querySelectorAll(
         `[data-key="effect"] ol li input.value`
     );
     effects.forEach((e) => {
@@ -145,17 +146,17 @@ function getCssMilSec(elem, prop) {
             })
     );
 }
-function elemOlLi(obj_value = "") {
+function elemOlLi(args = {}) {
     var li = document.createElement("li");
     var lin = document.createElement("input");
-    lin.value = obj_value;
+    var key = args.key || "";
+    var ulLi = args.ulLi || null;
+    lin.value = args.value || "";
     lin.classList.add("value");
     lin.onchange = (e) => {
-        var ol = li.parentElement;
-        var pl = ol.parentElement;
         rewriteUpdate(true);
-        if (pl.dataset.key === "effect") {
-            updatePreview(pl.parentElement);
+        if (key === "effect") {
+            updatePreview(ulLi);
         }
     };
     li.appendChild(lin);
@@ -164,12 +165,10 @@ function elemOlLi(obj_value = "") {
     minus.classList.add("minus");
     minus.value = "－";
     minus.onclick = (e) => {
-        var ol = li.parentElement;
-        var pl = ol.parentElement;
         rewriteUpdate(true);
         li.remove();
-        if (pl.dataset.key === "effect") {
-            updatePreview(pl.parentElement);
+        if (key === "effect") {
+            updatePreview(ulLi);
         }
     };
     li.appendChild(minus);
@@ -291,7 +290,7 @@ function elemUlLi(obj = {}) {
         var obj_list = obj[key] ? obj[key] : [];
         if (typeof obj_list !== "object") obj_list = [obj_list];
         obj_list.forEach((obj_value) => {
-            ol.appendChild(elemOlLi(obj_value));
+            ol.appendChild(elemOlLi({ value: obj_value, key: key, ulLi: li }));
         });
         cell.appendChild(ol);
         var plus = document.createElement("input");
@@ -299,7 +298,7 @@ function elemUlLi(obj = {}) {
         plus.value = "＋";
         plus.onclick = (e) => {
             rewriteUpdate(true);
-            ol.appendChild(elemOlLi());
+            ol.appendChild(elemOlLi({ key: key, ulLi: li }));
         };
         cell.appendChild(plus);
         li.appendChild(cell);
