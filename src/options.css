@@ -127,6 +127,34 @@ ul:not(#youtubeExensionMenu) > li > div {
 ul:not(#youtubeExensionMenu) > li > div > * {
     margin: 4px 0;
 }
+@keyframes fadeOutLi {
+    0% {
+        opacity: 1;
+    }
+    25% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        height: 0px;
+    }
+}
+li.remove {
+    --remove-time: 200ms;
+    animation-name: fadeOutLi;
+    animation-duration: var(--remove-time);
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    overflow: hidden;
+    opacity: 0;
+}
 ul {
     list-style: none;
     margin: auto;
@@ -197,6 +225,7 @@ textarea {
 }
 .button {
     cursor: pointer;
+    user-select: none;
 }
 @keyframes toast {
     0% {
@@ -221,6 +250,7 @@ textarea {
     }
 }
 #toast {
+    pointer-events: none;
     z-index: 2;
     right: 0;
     left: 0;
@@ -245,6 +275,7 @@ textarea {
     animation-fill-mode: forwards;
 }
 #toast > * {
+    pointer-events: auto;
     background-color: var(--list-color);
     padding: 9px 32px;
     border-radius: 4px;

@@ -181,7 +181,10 @@ function elemUlLi(obj = {}) {
             return false;
         };
         rewriteUpdate(true);
-        li.remove();
+        li.classList.add("remove");
+        setTimeout(() => {
+            li.remove();
+        }, getCssMilSec(li, "--remove-time"));
     };
     li.appendChild(close);
     var moveUp = document.createElement("div");
