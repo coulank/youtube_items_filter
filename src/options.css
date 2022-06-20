@@ -6,16 +6,17 @@
     --shadow-color-b: rgba(0, 0, 0, 0.1);
     --scroll-color: var(--shadow-color-a);
     --toast-time-default: 1s;
-    --swap-time: 150ms;
+}
+:root.smooth {
     scroll-behavior: smooth;
 }
 body {
+    background-color: var(--background-color);
     padding: 0;
     margin: 0;
 }
 * {
     color: var(--color);
-    background-color: var(--background-color);
     font-size: 14px;
     font-family: Roboto, Noto, sans-serif;
     position: relative;
@@ -33,12 +34,14 @@ ul#youtubeExensionMenu > li {
     margin: 16px auto;
     padding: 0;
 }
+.absolute {
+    position: absolute;
+}
 #editArea > ul > li > .button {
     z-index: 1;
 }
 #editArea > ul > li > .close {
     font-size: 2em;
-    position: absolute;
     display: block;
     width: auto;
     margin: 8px;
@@ -53,7 +56,6 @@ ul#youtubeExensionMenu > li {
 }
 #editArea > ul > li > .button.move {
     border-color: var(--shadow-color-a);
-    position: absolute;
     left: 0;
     opacity: 0.6;
     font-size: 2em;
@@ -86,7 +88,6 @@ ul#youtubeExensionMenu > li {
 }
 #editArea > ul > li > .preview {
     margin: 8px;
-    position: absolute;
     right: 0;
     bottom: 0;
     width: auto;
@@ -174,6 +175,21 @@ input.ulLiAdd {
 }
 ul > li input:hover {
     background-color: var(--shadow-color-a);
+}
+.swap {
+    --swap-time: 200ms;
+    visibility: hidden;
+}
+.swap .absolute {
+    display: none !important;
+}
+.swap.dammy {
+    z-index: 1;
+    position: absolute;
+    visibility: visible;
+}
+.swap.dammy .absolute {
+    display: block !important;
 }
 textarea {
     width: 80%;

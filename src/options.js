@@ -170,7 +170,7 @@ function elemOlLi(obj_value = "") {
 function elemUlLi(obj = {}) {
     var li = document.createElement("li");
     var close = document.createElement("div");
-    close.classList.add("button", "close");
+    close.classList.add("absolute", "button", "close");
     close.innerText = "✕";
     close.onclick = (e) => {
         undo = UlLiToList();
@@ -185,75 +185,79 @@ function elemUlLi(obj = {}) {
     };
     li.appendChild(close);
     var moveUp = document.createElement("div");
-    moveUp.classList.add("button", "move", "up");
+    moveUp.classList.add("absolute", "button", "move", "up");
     moveUp.onclick = (e) => {
         rewriteUpdate(true);
+        var y = scrollY;
         var list = [].slice.call(li.parentElement.children);
         var li_before = list[list.indexOf(li) - 1];
+        li.classList.add("swap");
+        li_before.classList.add("swap");
         var li_ofs_y = li.offsetTop;
         var li_before_ofs_y = li_before.offsetTop;
         li.after(li_before);
         var dammy_li = li.cloneNode(true);
-        dammy_li.style.position = "absolute";
         var dammy_li_before = li_before.cloneNode(true);
-        dammy_li_before.style.position = "absolute";
+        dammy_li.classList.add("dammy");
+        dammy_li_before.classList.add("dammy");
         li.before(dammy_li);
         dammy_li.before(dammy_li_before);
         dammy_li.style.transform = `translateY(${
             li_ofs_y - li_before_ofs_y
         }px)`;
+        scrollTo({ top: y });
         setTimeout(() => {
             dammy_li.style.transform = `translateY(0px)`;
             dammy_li_before.style.transform = `translateY(${
                 li_before.offsetTop - li_before_ofs_y
             }px)`;
             setTimeout(() => {
-                li.style.visibility = "";
-                li_before.style.visibility = "";
+                li.classList.remove("swap");
+                li_before.classList.remove("swap");
                 dammy_li.remove();
                 dammy_li_before.remove();
             }, getCssMilSec(dammy_li, "--swap-time"));
         });
-        li.style.visibility = "hidden";
-        li_before.style.visibility = "hidden";
     };
     li.appendChild(moveUp);
     var moveDown = document.createElement("div");
-    moveDown.classList.add("button", "move", "down");
+    moveDown.classList.add("absolute", "button", "move", "down");
     moveDown.onclick = (e) => {
         rewriteUpdate(true);
+        var y = scrollY;
         var list = [].slice.call(li.parentElement.children);
         var li_after = list[list.indexOf(li) + 1];
+        li.classList.add("swap");
+        li_after.classList.add("swap");
         var li_ofs_y = li.offsetTop;
         var li_after_ofs_y = li_after.offsetTop;
         li.before(li_after);
         var dammy_li = li.cloneNode(true);
-        dammy_li.style.position = "absolute";
         var dammy_li_after = li_after.cloneNode(true);
-        dammy_li_after.style.position = "absolute";
+        dammy_li.classList.add("dammy");
+        dammy_li_after.classList.add("dammy");
         li_after.before(dammy_li);
         dammy_li.after(dammy_li_after);
         dammy_li_after.style.transform = `translateY(${
             li_after_ofs_y - li_ofs_y
         }px)`;
+        scrollTo({ top: y });
         setTimeout(() => {
             dammy_li_after.style.transform = `translateY(0px)`;
             dammy_li.style.transform = `translateY(${
                 li.offsetTop - li_ofs_y
             }px)`;
             setTimeout(() => {
-                li.style.visibility = "";
-                li_after.style.visibility = "";
+                li.classList.remove("swap");
+                li_after.classList.remove("swap");
                 dammy_li.remove();
                 dammy_li_after.remove();
             }, getCssMilSec(dammy_li, "--swap-time"));
         });
-        li.style.visibility = "hidden";
-        li_after.style.visibility = "hidden";
     };
     li.appendChild(moveDown);
     var preview = document.createElement("div");
-    preview.classList.add("preview");
+    preview.classList.add("absolute", "preview");
     preview.innerHTML = ytb_preview_elm.innerHTML;
     li.appendChild(preview);
     ["channel", "title", "url", "effect"].forEach((key) => {
@@ -364,12 +368,18 @@ document.querySelector("#sample").addEventListener("click", funcSample);
 
 const to_top = document.getElementById("to-top");
 to_top.addEventListener("click", function (evt) {
-    window.scrollTo(0, 0);
+    document.firstChild.classList.add("smooth");
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+            document.firstChild.classList.remove("smooth");
+        });
+    });
 });
 document.addEventListener("scroll", () => {
     if (scrollY > 500) {
-        to_top.classList.add("show");    
+        to_top.classList.add("show");
     } else {
-        to_top.classList.remove("show");    
+        to_top.classList.remove("show");
     }
-})
+});
