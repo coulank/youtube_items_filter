@@ -314,6 +314,7 @@ plus_ul.value = "＋";
 plus_ul.classList.add("ulLiAdd");
 plus_ul.onclick = (e) => {
     rewriteUpdate(true);
+    smoothScroll({ top: document.firstChild.scrollHeight });
     ul.appendChild(elemUlLi());
 };
 ul.parentElement.appendChild(plus_ul);
@@ -368,16 +369,18 @@ document.querySelector("#export").addEventListener("click", funcExport);
 document.querySelector("#import").addEventListener("click", funcImport);
 document.querySelector("#delete").addEventListener("click", funcDelete);
 document.querySelector("#sample").addEventListener("click", funcSample);
-
-const to_top = document.getElementById("to-top");
-to_top.addEventListener("click", function (evt) {
+function smoothScroll(scroll) {
     document.firstChild.classList.add("smooth");
     setTimeout(() => {
-        window.scrollTo(0, 0);
+        window.scrollTo(scroll);
         setTimeout(() => {
             document.firstChild.classList.remove("smooth");
         });
     });
+}
+const to_top = document.getElementById("to-top");
+to_top.addEventListener("click", function (evt) {
+    smoothScroll({ top: 0 });
 });
 document.addEventListener("scroll", () => {
     if (scrollY > 500) {

@@ -31,8 +31,7 @@ ul#youtubeExensionMenu {
 }
 ul#youtubeExensionMenu > li {
     width: 100%;
-    min-height: 60px;
-    margin: 16px auto;
+    margin: 32px auto;
     padding: 0;
 }
 .absolute {
