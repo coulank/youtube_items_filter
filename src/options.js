@@ -1,6 +1,50 @@
 const title_default = "Filters Edit";
 const idi = "fs";
 var rewrite_flag = false;
+const css_check_elm = document.getElementById("css-check");
+function toHex(v, dig = 0) {
+    v = parseInt(Number(v)).toString(16);
+    return dig > 0 ? ("0".repeat(dig) + v).slice(-dig) : v;
+}
+function colorToObject(args) {
+    var color =
+        args.color || args.alpha || (typeof args === "object" ? "" : args);
+    if (isNaN(color) || Number(color) > 1) {
+        if (args.alpha) {
+            color =
+                colorToObject(color).rgb +
+                (args.alpha < 1 ? toHex(Number(args.alpha) * 256, 2) : "");
+        }
+        css_check_elm.style.color = "";
+        css_check_elm.style.color = color;
+        var propColor =
+            getComputedStyle(css_check_elm).getPropertyValue("color");
+        var m = propColor.match(/^\D+(\d+)\D+(\d+)\D+(\d+)\D+([\d.]+|)(\D+|)$/);
+        var hex = `#${toHex(m[1], 2)}${toHex(m[2], 2)}${toHex(m[3], 2)}`;
+        var unique =
+            !color.match(/^(#|rgb)/) &&
+            (hex !== "#ffffff" || (hex === "#ffffff" && color === "white"))
+                ? color
+                : "";
+        return {
+            type: "color",
+            color: propColor,
+            alpha: m[4],
+            rgb: hex,
+            rgba: hex + (m[4] === "" ? "ff" : toHex(Number(m[4]) * 256, 2)),
+            unique: unique,
+        };
+    } else {
+        return {
+            type: "alpha",
+            color: `rgba(0, 0, 0, ${color})`,
+            alpha: color,
+            rgb: "#000000",
+            rgba: `#000000${toHex(Number(color) * 256, 2)}`,
+            unique: "",
+        };
+    }
+}
 var title_elm = document.querySelector("title");
 const ul = document.querySelector("#editArea > ul");
 var toast_elm = document.getElementById("toast");
@@ -8,25 +52,122 @@ var ytb_preview_elm = document.getElementById("ytb_preview");
 var undo = null;
 const ef_menu_elm = document.getElementById("effect-menu");
 const ef_menu_form = ef_menu_elm.querySelector("form");
-ef_menu_form.effect_type.addEventListener("change", (e) => {
+function syncColor(args = {}) {
+    var color_obj = {};
+    var lins =
+        args.lins ||
+        document.querySelectorAll(`[data-key="effect"] li.target input.value`);
+    if (lins.length > 0) {
+        var color_args = {};
+        if (ef_menu_form.enable_color.checked)
+            color_args.color = ef_menu_form.color_text.value;
+        if (ef_menu_form.enable_alpha.checked)
+            color_args.alpha = ef_menu_form.alpha.value;
+        color_obj = colorToObject(color_args);
+        var result;
+        switch (color_obj.type) {
+            case "color":
+                result =
+                    color_obj.alpha != ""
+                        ? color_obj.rgba
+                        : color_obj.unique || color_obj.rgb;
+                break;
+            case "alpha":
+                result = color_obj.alpha;
+                break;
+        }
+        lins.forEach((lin) => {
+            lin.value = result;
+            lin.onchange();
+        });
+    }
+    return color_obj;
+}
+ef_menu_form.effect_type.onchange = (e, linSync = true) => {
     var lins = document.querySelectorAll(
         `[data-key="effect"] li.target input.value`
     );
-    var value = e.target.value;
+    var value = ef_menu_form.effect_type.value;
     var result = value;
-    switch (value.toLowerCase()) {
-        case "hidden":
-        case "hidden_title":
-        case "hidden_channel":
+    var alpha_color = document.getElementById("alpha-color");
+    switch (value) {
+        case "color":
+            if (lins.length > 0) {
+                var lin = lins[0];
+                switch (lin.value) {
+                    case "hidden":
+                    case "hidden_title":
+                    case "hidden_channel":
+                        break;
+                    default:
+                        var color_obj = colorToObject(lin.value);
+                        if (color_obj.type !== "alpha") {
+                            ef_menu_form.color_text.value =
+                                color_obj.unique || color_obj.rgb;
+                            ef_menu_form.color.value = color_obj.rgb;
+                        }
+                        ef_menu_form.alpha.value = color_obj.alpha;
+                        ef_menu_form.alpha_range.value = color_obj.alpha;
+                        ef_menu_form.enable_color.checked =
+                            color_obj.type !== "alpha";
+                        ef_menu_form.enable_color.onchange();
+                        ef_menu_form.enable_alpha.checked =
+                            color_obj.type !== "color" || color_obj.alpha != "";
+                        ef_menu_form.enable_alpha.onchange();
+                        break;
+                }
+            }
+            if (linSync) syncColor({ lins: lins });
+            linSync = false;
+            alpha_color.classList.remove("disable");
             break;
         default:
+            alpha_color.classList.add("disable");
             break;
     }
-    lins.forEach((lin) => {
-        lin.value = result;
-        lin.onchange();
-    });
-});
+    if (linSync) {
+        lins.forEach((lin) => {
+            lin.value = result;
+            lin.onchange();
+        });
+    }
+};
+ef_menu_form.enable_color.onchange = () => {
+    var color_form = document.getElementById("color-form");
+    if (ef_menu_form.enable_color.checked) {
+        color_form.classList.remove("disable");
+    } else {
+        color_form.classList.add("disable");
+    }
+    syncColor();
+};
+ef_menu_form.enable_alpha.onchange = () => {
+    var alpha_form = document.getElementById("alpha-form");
+    if (ef_menu_form.enable_alpha.checked) {
+        alpha_form.classList.remove("disable");
+    } else {
+        alpha_form.classList.add("disable");
+    }
+    syncColor();
+};
+ef_menu_form.color_text.onchange = () => {
+    var color_obj = syncColor();
+    if (color_obj.rgb) {
+        ef_menu_form.color.value = color_obj.rgb;
+    }
+};
+ef_menu_form.color.onchange = () => {
+    ef_menu_form.color_text.value = ef_menu_form.color.value;
+    ef_menu_form.color_text.onchange();
+};
+ef_menu_form.alpha_range.onchange = () => {
+    ef_menu_form.alpha.value = ef_menu_form.alpha_range.value;
+    ef_menu_form.alpha.onchange();
+};
+ef_menu_form.alpha.onchange = () => {
+    syncColor();
+    ef_menu_form.alpha_range.value = ef_menu_form.alpha.value;
+};
 function efmExit() {
     document.querySelectorAll(`[data-key="effect"] li.target`).forEach((li) => {
         li.querySelectorAll(".pulldown").forEach((pulldown) => {
@@ -41,9 +182,9 @@ function efmExit() {
         return false;
     }
 }
-ef_menu_elm.querySelector(".blur").addEventListener("click", () => {
+ef_menu_elm.querySelector(".blur").onclick = () => {
     efmExit();
-});
+};
 
 const yif_json = "yif_json";
 function csGet(key, func, notfunc = () => {}) {
@@ -159,7 +300,7 @@ function updatePreview(ulLi) {
             }
         } else if (value.match(/^show$/i)) {
             preview.style.display = "";
-        } else if (value.match(/^\d*\.?\d$/)) {
+        } else if (value.match(/^[\d.]*\.?[\d.]$/)) {
             preview.style.opacity = value;
         } else {
             preview.style.backgroundColor = value;
@@ -167,9 +308,9 @@ function updatePreview(ulLi) {
     });
 }
 function getNum(str) {
-    var m = str.match(/(\d+|)/);
+    var m = str.match(/([\d.]+|)/);
     if (m) {
-        return Number(str.match(/\d+/)[0]);
+        return Number(str.match(/[\d.]+/)[0]);
     } else {
         return 0;
     }
@@ -179,7 +320,7 @@ function getCssMilSec(elem, prop) {
         window
             .getComputedStyle(elem)
             .getPropertyValue(prop)
-            .replace(/(\d+)(\w+)/, ($0, $1, $2) => {
+            .replace(/([\d.]+)(\w+)/, ($0, $1, $2) => {
                 return Number($1) * ($2 === "s" ? 1000 : 1);
             })
     );
@@ -191,7 +332,7 @@ function elemOlLi(args = {}) {
     var ulLi = args.ulLi || null;
     lin.value = args.value || "";
     lin.classList.add("value");
-    lin.onchange = (e) => {
+    lin.onchange = () => {
         rewriteUpdate(true);
         if (key === "effect") {
             updatePreview(ulLi);
@@ -220,6 +361,7 @@ function elemOlLi(args = {}) {
                         ef_menu_form.effect_type.value = "color";
                         break;
                 }
+                ef_menu_form.effect_type.onchange({}, false);
                 ef_menu_elm.classList.add("show");
             }
         };

@@ -24,6 +24,22 @@
                 <option value="hidden_title">hidden_title</option>
                 <option value="hidden_channel">hidden_channel</option>
             </select>
+            <div id="alpha-color">
+                <div>
+                    <input type="checkbox" name="enable_color" checked>
+                    <div id="color-form">
+                        <input type="color" name="color">
+                        <input type="text" name="color_text">
+                    </div>
+                </div>
+                <div>
+                    <input type="checkbox" name="enable_alpha" checked>
+                    <div id="alpha-form">
+                        <input type="range" name="alpha_range" min=0 max=1 step=0.01>
+                        <input type="number" name="alpha" min=0 max=1 step=0.001>
+                    </div>
+                </div>
+            </div>
         </form>
         <div class="blur"></div>
     </div>
@@ -46,17 +62,20 @@
             </div>
         </li>
     </ul>
-    <div id="svg_data" style="display:none">
-        <div id="ytb_preview">
-            <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="160" height="90" fill="#808080" />
-                <path d="M105 45L61 20V70" fill="white" fill-opacity="0.5" />
-                <path class="title" fill-rule="evenodd" clip-rule="evenodd"
-                    d="M143 97H5V108H143V97ZM143 112H5V123H143V112Z" fill="black" fill-opacity="0.5" />
-                <rect class="channel" x="5" y="130" width="106" height="10" fill="black" fill-opacity="0.25" />
-                <rect x="148" y="94" width="6" height="12" fill="black" fill-opacity="0.5" />
-                <rect x="5" y="143" width="106" height="10" fill="black" fill-opacity="0.25" />
-            </svg>
+    <div style="display:none">
+        <div id="css-check"></div>
+        <div id="svg_data">
+            <div id="ytb_preview">
+                <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="160" height="90" fill="#808080" />
+                    <path d="M105 45L61 20V70" fill="white" fill-opacity="0.5" />
+                    <path class="title" fill-rule="evenodd" clip-rule="evenodd"
+                        d="M143 97H5V108H143V97ZM143 112H5V123H143V112Z" fill="black" fill-opacity="0.5" />
+                    <rect class="channel" x="5" y="130" width="106" height="10" fill="black" fill-opacity="0.25" />
+                    <rect x="148" y="94" width="6" height="12" fill="black" fill-opacity="0.5" />
+                    <rect x="5" y="143" width="106" height="10" fill="black" fill-opacity="0.25" />
+                </svg>
+            </div>
         </div>
     </div>
 </body>

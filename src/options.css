@@ -7,6 +7,7 @@
     --shadow-color-b: rgba(0, 0, 0, 0.1);
     --scroll-color: var(--shadow-color-a);
     --toast-time-default: 1s;
+    --disable-opacity: 0.5;
 }
 :root.smooth {
     scroll-behavior: smooth;
@@ -26,6 +27,9 @@ body {
 input:focus,
 select:focus {
     outline: 1px var(--sub-color) solid;
+}
+select {
+    user-select: none;
 }
 select:not([size]) option {
     color: black;
@@ -220,13 +224,15 @@ input.value {
     position: absolute;
     display: none;
 }
-#effect-menu .menu {
+#effect-menu form.menu {
     width: 244px;
     padding: 16px 8px;
     z-index: 11;
     background-color: var(--list-color);
     border-radius: 4px;
     box-shadow: 1px 4px 5px var(--shadow-color-a);
+    display: flex;
+    flex-direction: column;
 }
 #effect-menu .blur {
     position: fixed;
@@ -234,9 +240,58 @@ input.value {
     z-index: 10;
     /* background-color: rgba(255, 0, 0, 0.115); */
 }
-
 #effect-menu.show {
     display: block;
+}
+.disable {
+    opacity: var(--disable-opacity);
+    pointer-events: none;
+}
+#effect-menu form.menu > *:not(:last-child) {
+    margin-bottom: 12px;
+}
+#alpha-color {
+    display: flex;
+    flex-direction: column;
+}
+#alpha-color > * {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+#alpha-color > *:not(:last-child) {
+    margin-bottom: 8px;
+}
+#alpha-color > * > * {
+    display: flex;
+    flex-direction: row;
+}
+#effect-menu [type="color"] {
+    padding: 0 4px;
+    height: 28px;
+    width: 46px;
+}
+#effect-menu [name="color_text"] {
+    height: 28px;
+    font-size: 12px;
+    width: 112px;
+}
+#effect-menu [name="alpha_range"] {
+    margin: 0;
+    padding: 0;
+    height: 28px;
+    width: 66px;
+}
+#effect-menu [name="alpha"] {
+    height: 28px;
+    padding-left: 12px;
+    padding-right: 6px;
+    font-size: 12px;
+    width: 96px;
+}
+#alpha-color > * > * > *:not(:last-child) {
+    margin-right: 4px;
 }
 input.minus {
     width: 28px;
