@@ -70,6 +70,7 @@ function video_filter(video_renderer) {
     var channel_elm = (channel_header || video_renderer).querySelector(
         "#channel-name"
     );
+    var thumbnail_elm = video_renderer.querySelector("ytd-thumbnail");
     var channel_name = (channel_elm || innerTextBlank).innerText;
     var verified = Boolean(
         (channel_header || video_renderer).querySelector(
@@ -281,6 +282,10 @@ function video_filter(video_renderer) {
                         case "hidden_channel":
                             if (channel_elm !== null)
                                 channel_elm.style.visibility = "hidden";
+                            break;
+                        case "hidden_thumbnail":
+                            if (thumbnail_elm !== null)
+                                thumbnail_elm.style.visibility = "hidden";
                             break;
                     }
                     style_object.display = "";

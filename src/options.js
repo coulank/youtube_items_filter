@@ -121,6 +121,7 @@ ef_menu_form.effect_type.onchange = (e, linSync = true) => {
                     case "hidden":
                     case "hidden_title":
                     case "hidden_channel":
+                    case "hidden_thumbnail":
                         break;
                     default:
                         var color = lin.value;
@@ -330,18 +331,7 @@ function updatePreview(ulLi) {
     effects.forEach((e) => {
         var value = e.value;
         if (value.match(/^hidden/i)) {
-            switch (value.toLowerCase()) {
-                case "hidden":
-                    preview.style.display = "none";
-                    break;
-                case "hidden_title":
-                    preview.querySelector(".title").style.visibility = "hidden";
-                    break;
-                case "hidden_channel":
-                    preview.querySelector(".channel").style.visibility =
-                        "hidden";
-                    break;
-            }
+            preview.classList.add(value.toLowerCase());
         } else if (value.match(/^show$/i)) {
             preview.style.display = "";
         } else if (value.match(/^[\d.]*\.?[\d.]$/)) {
@@ -382,6 +372,7 @@ function elemOlLi(args = {}) {
                 case "hidden":
                 case "hidden_title":
                 case "hidden_channel":
+                case "hidden_thumbnail":
                     ef_menu_form.effect_type.value = lin.value;
                     break;
                 default:

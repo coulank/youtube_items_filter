@@ -113,7 +113,14 @@ ul#youtubeExensionMenu > li {
 #editArea > ul > li > .preview > svg [fill="black"] {
     fill: var(--color);
 }
-
+.preview .hidden {
+    display: none;
+}
+.preview .hidden_title .title,
+.preview .hidden_channel .channel,
+.preview .hidden_thumbnail .thumbnail {
+    visibility: hidden;
+}
 ul:not(#youtubeExensionMenu) {
     margin: 0 8px;
 }
