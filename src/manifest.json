@@ -1,9 +1,15 @@
 {
     "name": "YouTube Items Filter",
     "author": "kouwtkz",
-    "version": "1.9.4",
+    "version": "1.9.5",
     "manifest_version": 3,
     "description": "This is to filter YouTube video list.",
+    "icons": {
+        "32": "icon32.png",
+        "48": "icon48.png",
+        "128": "icon128.png",
+        "192": "icon192.png"
+    },
     "content_scripts": [
         {
             "matches": ["https://www.youtube.com/*"],
