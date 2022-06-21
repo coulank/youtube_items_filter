@@ -67,6 +67,9 @@ const ef_menu_elm = document.getElementById("effect-menu");
 const ef_menu_form = ef_menu_elm.querySelector("form");
 function syncColor(args = {}) {
     var color_obj = {};
+    var replaceBlank =
+        typeof args.replaceBlank === "undefined" ? true : args.replaceBlank;
+    var linSync = typeof args.linSync === "undefined" ? true : args.linSync;
     var lins =
         args.lins ||
         document.querySelectorAll(`[data-key="effect"] li.target input.value`);
@@ -80,7 +83,7 @@ function syncColor(args = {}) {
         var result;
         switch (color_obj.type) {
             case "blank":
-                if (args.replaceBlank) {
+                if (replaceBlank) {
                     result = "";
                 }
                 break;
@@ -94,7 +97,7 @@ function syncColor(args = {}) {
                 result = color_obj.alpha;
                 break;
         }
-        if (typeof result !== "undefined") {
+        if (linSync && typeof result !== "undefined") {
             lins.forEach((lin) => {
                 lin.value = result;
                 lin.onchange();
@@ -140,7 +143,7 @@ ef_menu_form.effect_type.onchange = (e, linSync = true) => {
                             notIsBlank;
                         break;
                 }
-                syncFormEnableColorAlpha(true, true);
+                syncFormEnableColorAlpha(true, true, { linSync: linSync });
             }
             if (linSync) syncColor({ lins: lins });
             linSync = false;
@@ -164,11 +167,8 @@ function changeEnable(elm, enable) {
         elm.classList.add("disable");
     }
 }
-function syncFormEnableColorAlpha(
-    do_color = true,
-    do_alpha = true,
-    replaceBlank = true
-) {
+function syncFormEnableColorAlpha(do_color = true, do_alpha = true, args = {}) {
+    var linSync = args.linSync || true;
     if (do_color) {
         changeEnable(
             ef_menu_form.color_text,
@@ -179,9 +179,7 @@ function syncFormEnableColorAlpha(
         changeEnable(ef_menu_form.alpha, ef_menu_form.enable_alpha.checked);
         ef_menu_form.alpha_range.value = ef_menu_form.alpha.value;
     }
-    var args = {};
-    if (replaceBlank) args.replaceBlank = true;
-    syncColor(args);
+    if (linSync) syncColor(args);
 }
 ef_menu_form.enable_color.onchange = () => {
     syncFormEnableColorAlpha(true, false);
@@ -189,13 +187,7 @@ ef_menu_form.enable_color.onchange = () => {
 ef_menu_form.enable_alpha.onchange = () => {
     syncFormEnableColorAlpha(false, true);
 };
-function syncFormColorAlpha(
-    do_color = true,
-    do_alpha = true,
-    replaceBlank = false
-) {
-    var args = {};
-    if (replaceBlank) args.replaceBlank = true;
+function syncFormColorAlpha(do_color = true, do_alpha = true, args = {}) {
     var color_obj = syncColor(args);
     if (do_color && color_obj.rgb) {
         ef_menu_form.color.value = color_obj.rgb;
@@ -384,9 +376,25 @@ function elemOlLi(args = {}) {
     var ulLi = args.ulLi || null;
     lin.value = args.value || "";
     lin.classList.add("value");
+    var setMenu = () => {
+        if (li.classList.contains("target")) {
+            switch (lin.value.toLowerCase()) {
+                case "hidden":
+                case "hidden_title":
+                case "hidden_channel":
+                    ef_menu_form.effect_type.value = lin.value;
+                    break;
+                default:
+                    ef_menu_form.effect_type.value = "color";
+                    break;
+            }
+            ef_menu_form.effect_type.onchange({}, false);
+        }
+    };
     lin.onchange = () => {
         rewriteUpdate(true);
         if (key === "effect") {
+            setMenu();
             updatePreview(ulLi);
         }
     };
@@ -403,17 +411,7 @@ function elemOlLi(args = {}) {
                 li.appendChild(ef_menu_elm);
                 pulldown.value = "△";
                 li.classList.add("target");
-                switch (lin.value.toLowerCase()) {
-                    case "hidden":
-                    case "hidden_title":
-                    case "hidden_channel":
-                        ef_menu_form.effect_type.value = lin.value;
-                        break;
-                    default:
-                        ef_menu_form.effect_type.value = "color";
-                        break;
-                }
-                ef_menu_form.effect_type.onchange({}, false);
+                setMenu();
                 ef_menu_elm.classList.add("show");
             }
         };
