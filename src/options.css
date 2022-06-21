@@ -7,7 +7,7 @@
     --shadow-color-b: rgba(0, 0, 0, 0.1);
     --scroll-color: var(--shadow-color-a);
     --toast-time-default: 1s;
-    --disable-opacity: 0.5;
+    --disable-opacity: 0.4;
 }
 :root.smooth {
     scroll-behavior: smooth;

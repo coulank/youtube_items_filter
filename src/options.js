@@ -3,8 +3,12 @@ const idi = "fs";
 var rewrite_flag = false;
 const css_check_elm = document.getElementById("css-check");
 function toHex(v, dig = 0) {
-    v = parseInt(Number(v)).toString(16);
+    v = Math.round(Number(v)).toString(16);
     return dig > 0 ? ("0".repeat(dig) + v).slice(-dig) : v;
+}
+function alphaToHex(v) {
+    var v2 = Number(v) * 255;
+    return toHex(v2, 2);
 }
 function colorToObject(args) {
     var color =
@@ -13,7 +17,7 @@ function colorToObject(args) {
         if (args.alpha) {
             color =
                 colorToObject(color).rgb +
-                (args.alpha < 1 ? toHex(Number(args.alpha) * 256, 2) : "");
+                (args.alpha < 1 ? alphaToHex(args.alpha) : "");
         }
         css_check_elm.style.color = "";
         css_check_elm.style.color = color;
@@ -31,8 +35,17 @@ function colorToObject(args) {
             color: propColor,
             alpha: m[4],
             rgb: hex,
-            rgba: hex + (m[4] === "" ? "ff" : toHex(Number(m[4]) * 256, 2)),
+            rgba: hex + (m[4] === "" ? "ff" : alphaToHex(m[4])),
             unique: unique,
+        };
+    } else if (color == "") {
+        return {
+            type: "blank",
+            color: "",
+            alpha: "",
+            rgb: "",
+            rgba: "",
+            unique: "",
         };
     } else {
         return {
@@ -40,7 +53,7 @@ function colorToObject(args) {
             color: `rgba(0, 0, 0, ${color})`,
             alpha: color,
             rgb: "#000000",
-            rgba: `#000000${toHex(Number(color) * 256, 2)}`,
+            rgba: `#000000${alphaToHex(color)}`,
             unique: "",
         };
     }
@@ -66,6 +79,11 @@ function syncColor(args = {}) {
         color_obj = colorToObject(color_args);
         var result;
         switch (color_obj.type) {
+            case "blank":
+                if (args.replaceBlank) {
+                    result = "";
+                }
+                break;
             case "color":
                 result =
                     color_obj.alpha != ""
@@ -76,10 +94,12 @@ function syncColor(args = {}) {
                 result = color_obj.alpha;
                 break;
         }
-        lins.forEach((lin) => {
-            lin.value = result;
-            lin.onchange();
-        });
+        if (typeof result !== "undefined") {
+            lins.forEach((lin) => {
+                lin.value = result;
+                lin.onchange();
+            });
+        }
     }
     return color_obj;
 }
@@ -100,22 +120,27 @@ ef_menu_form.effect_type.onchange = (e, linSync = true) => {
                     case "hidden_channel":
                         break;
                     default:
-                        var color_obj = colorToObject(lin.value);
-                        if (color_obj.type !== "alpha") {
-                            ef_menu_form.color_text.value =
-                                color_obj.unique || color_obj.rgb;
-                            ef_menu_form.color.value = color_obj.rgb;
+                        var color = lin.value;
+                        var color_obj = colorToObject(color);
+                        var notIsBlank = color_obj.type !== "blank";
+                        if (notIsBlank) {
+                            if (color_obj.type !== "alpha") {
+                                ef_menu_form.color_text.value =
+                                    color_obj.unique || color_obj.rgb;
+                                ef_menu_form.color.value = color_obj.rgb;
+                            }
+                            ef_menu_form.alpha.value = color_obj.alpha;
+                            ef_menu_form.alpha_range.value = color_obj.alpha;
                         }
-                        ef_menu_form.alpha.value = color_obj.alpha;
-                        ef_menu_form.alpha_range.value = color_obj.alpha;
                         ef_menu_form.enable_color.checked =
-                            color_obj.type !== "alpha";
-                        ef_menu_form.enable_color.onchange();
+                            color_obj.type !== "alpha" && notIsBlank;
                         ef_menu_form.enable_alpha.checked =
-                            color_obj.type !== "color" || color_obj.alpha != "";
-                        ef_menu_form.enable_alpha.onchange();
+                            (color_obj.type !== "color" ||
+                                color_obj.alpha != "") &&
+                            notIsBlank;
                         break;
                 }
+                syncFormEnableColorAlpha(true, true);
             }
             if (linSync) syncColor({ lins: lins });
             linSync = false;
@@ -132,41 +157,68 @@ ef_menu_form.effect_type.onchange = (e, linSync = true) => {
         });
     }
 };
-ef_menu_form.enable_color.onchange = () => {
-    var color_form = document.getElementById("color-form");
-    if (ef_menu_form.enable_color.checked) {
-        color_form.classList.remove("disable");
+function changeEnable(elm, enable) {
+    if (enable) {
+        elm.classList.remove("disable");
     } else {
-        color_form.classList.add("disable");
+        elm.classList.add("disable");
     }
-    syncColor();
+}
+function syncFormEnableColorAlpha(
+    do_color = true,
+    do_alpha = true,
+    replaceBlank = true
+) {
+    if (do_color) {
+        changeEnable(
+            ef_menu_form.color_text,
+            ef_menu_form.enable_color.checked
+        );
+    }
+    if (do_alpha) {
+        changeEnable(ef_menu_form.alpha, ef_menu_form.enable_alpha.checked);
+        ef_menu_form.alpha_range.value = ef_menu_form.alpha.value;
+    }
+    var args = {};
+    if (replaceBlank) args.replaceBlank = true;
+    syncColor(args);
+}
+ef_menu_form.enable_color.onchange = () => {
+    syncFormEnableColorAlpha(true, false);
 };
 ef_menu_form.enable_alpha.onchange = () => {
-    var alpha_form = document.getElementById("alpha-form");
-    if (ef_menu_form.enable_alpha.checked) {
-        alpha_form.classList.remove("disable");
-    } else {
-        alpha_form.classList.add("disable");
-    }
-    syncColor();
+    syncFormEnableColorAlpha(false, true);
 };
-ef_menu_form.color_text.onchange = () => {
-    var color_obj = syncColor();
-    if (color_obj.rgb) {
+function syncFormColorAlpha(
+    do_color = true,
+    do_alpha = true,
+    replaceBlank = false
+) {
+    var args = {};
+    if (replaceBlank) args.replaceBlank = true;
+    var color_obj = syncColor(args);
+    if (do_color && color_obj.rgb) {
         ef_menu_form.color.value = color_obj.rgb;
     }
+    if (do_alpha) {
+        ef_menu_form.alpha_range.value = ef_menu_form.alpha.value;
+    }
+}
+ef_menu_form.color_text.onchange = () => {
+    syncFormColorAlpha(true, false);
 };
 ef_menu_form.color.onchange = () => {
     ef_menu_form.color_text.value = ef_menu_form.color.value;
-    ef_menu_form.color_text.onchange();
+    ef_menu_form.enable_color.checked = true;
+    syncFormEnableColorAlpha(true, false);
 };
 ef_menu_form.alpha_range.onchange = () => {
     ef_menu_form.alpha.value = ef_menu_form.alpha_range.value;
-    ef_menu_form.alpha.onchange();
+    ef_menu_form.enable_alpha.checked = true;
+    syncFormEnableColorAlpha(false, true);
 };
 ef_menu_form.alpha.onchange = () => {
-    syncColor();
-    ef_menu_form.alpha_range.value = ef_menu_form.alpha.value;
+    syncFormColorAlpha(false, true);
 };
 function efmExit() {
     document.querySelectorAll(`[data-key="effect"] li.target`).forEach((li) => {
