@@ -100,7 +100,7 @@ function syncColor(args = {}) {
         if (linSync && typeof result !== "undefined") {
             lins.forEach((lin) => {
                 lin.value = result;
-                lin.onchange({setMenu: false});
+                lin.onchange({ setMenu: false });
             });
         }
     }
@@ -391,7 +391,7 @@ function elemOlLi(args = {}) {
             ef_menu_form.effect_type.onchange({}, false);
         }
     };
-    lin.onchange = (e) => {
+    lin.onchange = (e = {}) => {
         var doSetMenu = typeof e.setMenu === "undefined" ? true : e.setMenu;
         rewriteUpdate(true);
         if (key === "effect") {
